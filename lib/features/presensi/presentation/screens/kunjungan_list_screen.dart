@@ -6,8 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as ll;
 
-const Color primaryColor = Color(0xFF32745e);
-
 class KunjunganListScreen extends ConsumerStatefulWidget {
   const KunjunganListScreen({super.key});
 
@@ -16,6 +14,7 @@ class KunjunganListScreen extends ConsumerStatefulWidget {
 }
 
 class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
+  Color get primaryColor => Theme.of(context).primaryColor;
   bool _isLoading = true;
   List<dynamic> _visitList = [];
   String? _errorMessage;
@@ -69,7 +68,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(primary: primaryColor),
+          colorScheme: ColorScheme.light(primary: primaryColor),
         ),
         child: child!,
       ),
@@ -94,7 +93,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(primary: primaryColor),
+          colorScheme: ColorScheme.light(primary: primaryColor),
         ),
         child: child!,
       ),
@@ -352,7 +351,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
                         children: [
                           Text('DARI', style: TextStyle(fontSize: 9, color: Colors.grey[500], fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text(_formatDisplayDate(_startDate), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
+                          Text(_formatDisplayDate(_startDate), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
                         ],
                       ),
                     ),
@@ -366,7 +365,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
                         children: [
                           Text('SAMPAI', style: TextStyle(fontSize: 9, color: Colors.grey[500], fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
-                          Text(_formatDisplayDate(_endDate), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
+                          Text(_formatDisplayDate(_endDate), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor)),
                         ],
                       ),
                     ),
@@ -381,6 +380,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: () async {
           final result = await Navigator.push(
             context,
@@ -401,7 +401,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
 
   Widget _buildVisitList() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: primaryColor));
+      return Center(child: CircularProgressIndicator(color: primaryColor));
     }
 
     if (_errorMessage != null) {
@@ -531,7 +531,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
                                     children: [
                                       Text(
                                         item['jam'] ?? '',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12,
                                           color: primaryColor,
@@ -562,7 +562,7 @@ class _KunjunganListScreenState extends ConsumerState<KunjunganListScreen> {
                                     const SizedBox(height: 6),
                                     Row(
                                       children: [
-                                        const Icon(Icons.location_on_outlined, size: 12, color: primaryColor),
+                                        Icon(Icons.location_on_outlined, size: 12, color: primaryColor),
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: Text(

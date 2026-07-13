@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:dio/dio.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
 import 'package:gaweflutter/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:gaweflutter/data/models/dashboard_model.dart';
@@ -20,6 +22,7 @@ import 'package:gaweflutter/features/presensi/presentation/screens/aktivitas_lis
 import 'package:gaweflutter/features/presensi/presentation/screens/lainnya_screen.dart';
 import 'package:gaweflutter/features/presensi/presentation/screens/absen_istirahat_screen.dart';
 import 'package:gaweflutter/features/presensi/presentation/screens/lembur_presensi_screen.dart';
+import 'package:gaweflutter/core/theme/app_theme_scheme.dart';
 
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -54,11 +57,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int _activeAlertPage = 0;
   int _totalAlertPages = 0;
   Timer? _sliderTimer;
+  String _currentLocationName = 'Mencari lokasi...';
 
   @override
   void initState() {
     super.initState();
     _updateTime();
+    _fetchCurrentLocation();
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateTime());
     _sliderTimer = Timer.periodic(const Duration(seconds: 5), (Timer t) {
       if (_pageController.hasClients && _totalAlertPages > 1) {
@@ -70,6 +75,99 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         );
       }
     });
+  }
+
+  Future<void> _fetchCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          setState(() {
+            _currentLocationName = 'GPS tidak aktif';
+          });
+        }
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            setState(() {
+              _currentLocationName = 'Izin lokasi ditolak';
+            });
+          }
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          setState(() {
+            _currentLocationName = 'Izin lokasi ditolak permanen';
+          });
+        }
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.low),
+      );
+
+      final dio = Dio();
+      dio.options.headers['User-Agent'] = 'GaweFlutter/1.0';
+      final response = await dio.get(
+        'https://nominatim.openstreetmap.org/reverse',
+        queryParameters: {
+          'format': 'json',
+          'lat': position.latitude,
+          'lon': position.longitude,
+          'zoom': 18,
+          'addressdetails': 1,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final address = response.data['address'];
+        String? displayName = response.data['display_name'];
+        String locationText = '';
+        if (address != null) {
+          final road = address['road'] ?? address['suburb'] ?? address['village'] ?? '';
+          final city = address['city'] ?? address['regency'] ?? address['municipality'] ?? '';
+          if (road.isNotEmpty && city.isNotEmpty) {
+            locationText = '$road, $city';
+          } else if (displayName != null) {
+            final parts = displayName.split(',');
+            if (parts.length > 2) {
+              locationText = '${parts[0].trim()}, ${parts[1].trim()}';
+            } else {
+              locationText = displayName;
+            }
+          }
+        }
+        if (locationText.isEmpty && displayName != null) {
+          locationText = displayName;
+        }
+        if (mounted) {
+          setState(() {
+            _currentLocationName = locationText.isNotEmpty ? locationText : 'Lokasi tidak diketahui';
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _currentLocationName = '${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}';
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _currentLocationName = 'Gagal mendapatkan lokasi';
+        });
+      }
+    }
   }
 
   @override
@@ -152,8 +250,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF32745e);
-    const Color bodyBgColor = Color(0xFFE8F0ED);
+    final dashboardAsync = ref.watch(dashboardProvider);
+    final generalSetting = dashboardAsync.value?.generalSetting;
+
+    final Color primaryColor = AppThemeScheme.getPrimary(generalSetting?.mobileThemeScheme);
+    final Color bodyBgColor = AppThemeScheme.getBg(generalSetting?.mobileThemeScheme);
 
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -186,7 +287,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Navigator(
               key: _homeNavigatorKey,
               onGenerateRoute: (settings) => MaterialPageRoute(
-                builder: (context) => _buildHomeTab(primaryColor, bodyBgColor),
+                builder: (context) => _buildHomeTab(),
               ),
             ),
             Navigator(
@@ -201,6 +302,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 setState(() {
                   _currentIndex = 0;
                 });
+                ref.invalidate(dashboardProvider);
+                ref.invalidate(lemburListProvider);
               },
             ),
             Navigator(
@@ -219,6 +322,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () {
           setState(() {
             _currentIndex = 2; // Switch to Presensi/Fingerprint tab
@@ -267,6 +371,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           setState(() {
             _currentIndex = index;
           });
+          if (index == 0) {
+            ref.invalidate(dashboardProvider);
+            ref.invalidate(lemburListProvider);
+          }
         }
       },
       borderRadius: BorderRadius.circular(12),
@@ -296,11 +404,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildHomeTab(Color primaryColor, Color bodyBgColor) {
+  Widget _buildHomeTab() {
     final authState = ref.watch(authProvider);
     final user = authState.user;
     final dashboardState = ref.watch(dashboardProvider);
     final lemburListAsync = ref.watch(lemburListProvider);
+
+    final Color primaryColor = AppThemeScheme.getPrimary(dashboardState.value?.generalSetting?.mobileThemeScheme);
+    final Color bodyBgColor = AppThemeScheme.getBg(dashboardState.value?.generalSetting?.mobileThemeScheme);
+
     final int notifLembur = lemburListAsync.when(
       data: (list) {
         return list.where((item) {
@@ -318,6 +430,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       onRefresh: () async {
         await ref.read(authProvider.notifier).refreshProfile();
         ref.invalidate(dashboardProvider);
+        ref.invalidate(lemburListProvider);
+        await _fetchCurrentLocation();
       },
       color: primaryColor,
       child: SafeArea(
@@ -330,159 +444,211 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               // ===== HERO SECTION =====
               Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [primaryColor, const Color(0xFF439075)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(40),
                     bottomRight: Radius.circular(40),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black26,
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 15,
-                      offset: Offset(0, 5),
+                      offset: const Offset(0, 5),
                     )
                   ],
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 50, 20, 72),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                            onPressed: () {},
-                          ),
-                        ),
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.logout_rounded, color: Colors.white),
-                            onPressed: _showLogoutConfirmation,
-                          ),
-                        ),
-                      ],
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          primaryColor,
+                          AppThemeScheme.getLight(dashboardState.value?.generalSetting?.mobileThemeScheme)
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    child: Stack(
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                user?.name ?? 'Nama Karyawan',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${user?.jabatan ?? "-"} (${user?.departemen ?? "-"})',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                ),
-                              ),
-                            ],
+                        // Fluid Wave Ornaments
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: HeaderWavePainter(),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () => setState(() => _currentIndex = 4),
-                          child: Stack(
-                            alignment: Alignment.center,
+                        // Main content
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 50, 20, 72),
+                          child: Column(
                             children: [
-                              Container(
-                                width: 62,
-                                height: 62,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+                                      onPressed: () {},
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.logout_rounded, color: Colors.white),
+                                      onPressed: _showLogoutConfirmation,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Container(
-                                width: 54,
-                                height: 54,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2.5),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 8,
-                                      offset: Offset(0, 3),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user?.name ?? 'Nama Karyawan',
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '${user?.jabatan ?? "-"} (${user?.departemen ?? "-"})',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white.withValues(alpha: 0.8),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => setState(() => _currentIndex = 4),
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          width: 82,
+                                          height: 82,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white.withValues(alpha: 0.15),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 72,
+                                          height: 72,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.white, width: 2.5),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                blurRadius: 8,
+                                                offset: Offset(0, 3),
+                                              )
+                                            ],
+                                          ),
+                                          child: ClipOval(
+                                            child: (user?.foto != null && user!.foto!.isNotEmpty)
+                                                ? Image.network(
+                                                    user.foto!,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context, error, stackTrace) => Container(
+                                                      color: Colors.grey[200],
+                                                      child: Icon(Icons.person, size: 42, color: primaryColor),
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    color: Colors.grey[200],
+                                                    child: Icon(Icons.person, size: 42, color: primaryColor),
+                                                  ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                _timeString,
+                                style: const TextStyle(
+                                  fontSize: 38,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -1.0,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black12,
+                                      offset: Offset(0, 4),
+                                      blurRadius: 15,
                                     )
                                   ],
                                 ),
-                                child: ClipOval(
-                                  child: (user?.foto != null && user!.foto!.isNotEmpty)
-                                      ? Image.network(
-                                          user.foto!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => Container(
-                                            color: Colors.grey[200],
-                                            child: Icon(Icons.person, size: 32, color: primaryColor),
-                                          ),
-                                        )
-                                      : Container(
-                                          color: Colors.grey[200],
-                                          child: Icon(Icons.person, size: 32, color: primaryColor),
-                                        ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _dateString,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white.withValues(alpha: 0.85),
                                 ),
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.location_on_rounded,
+                                    color: Colors.white70,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      _currentLocationName,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      _timeString,
-                      style: const TextStyle(
-                        fontSize: 38,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -1.0,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black12,
-                            offset: Offset(0, 4),
-                            blurRadius: 15,
-                          )
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _dateString,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
 
@@ -1748,3 +1914,74 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 }
+
+class HeaderWavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Wave 1 (Upper Wave)
+    final paint1 = Paint()
+      ..color = Colors.white.withValues(alpha: 0.05)
+      ..style = PaintingStyle.fill;
+
+    final path1 = Path()
+      ..moveTo(0, size.height * 0.55)
+      ..quadraticBezierTo(
+        size.width * 0.25,
+        size.height * 0.4,
+        size.width * 0.5,
+        size.height * 0.65,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.75,
+        size.height * 0.9,
+        size.width,
+        size.height * 0.7,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    // Wave 2 (Lower Wave)
+    final paint2 = Paint()
+      ..color = Colors.white.withValues(alpha: 0.035)
+      ..style = PaintingStyle.fill;
+
+    final path2 = Path()
+      ..moveTo(0, size.height * 0.75)
+      ..quadraticBezierTo(
+        size.width * 0.3,
+        size.height * 0.9,
+        size.width * 0.6,
+        size.height * 0.68,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.85,
+        size.height * 0.5,
+        size.width,
+        size.height * 0.65,
+      )
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    canvas.drawPath(path1, paint1);
+    canvas.drawPath(path2, paint2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+Color parseHexColor(String? hexString, Color defaultColor) {
+  if (hexString == null || hexString.isEmpty) return defaultColor;
+  try {
+    String formatted = hexString.replaceAll('#', '');
+    if (formatted.length == 6) {
+      formatted = 'FF$formatted';
+    }
+    return Color(int.parse(formatted, radix: 16));
+  } catch (_) {
+    return defaultColor;
+  }
+}
+

@@ -10,8 +10,6 @@ import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 
-const Color primaryColor = Color(0xFF32745e);
-
 class LemburPresensiScreen extends ConsumerStatefulWidget {
   final int idLembur;
   final int status; // 1 = masuk, 2 = pulang
@@ -27,6 +25,8 @@ class LemburPresensiScreen extends ConsumerStatefulWidget {
 }
 
 class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> with SingleTickerProviderStateMixin {
+  Color get primaryColor => Theme.of(context).primaryColor;
+  
   // Camera & Face Detection
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -245,9 +245,10 @@ class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> wit
           _isFaceDetected = faceInsideOval;
         });
 
-        if (_isFaceDetected && !_isSubmitting && _currentPosition != null) {
-          _doSubmitAbsenLembur();
-        }
+        // Auto submit disabled. User must press the manual capture button.
+        // if (_isFaceDetected && !_isSubmitting && _currentPosition != null) {
+        //   _doSubmitAbsenLembur();
+        // }
       }
     } catch (e) {
       debugPrint("Face detection error: $e");
@@ -286,10 +287,10 @@ class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> wit
             builder: (context) => AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Row(
-                children: const [
+                children: [
                   Icon(Icons.check_circle_rounded, color: primaryColor, size: 28),
-                  SizedBox(width: 8),
-                  Text('Absen Berhasil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(width: 8),
+                  const Text('Absen Berhasil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ],
               ),
               content: Text(result['message'] ?? 'Data lembur berhasil disimpan.'),
@@ -299,7 +300,7 @@ class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> wit
                     Navigator.pop(context); // Close dialog
                     Navigator.pop(context, true); // Pop screen with success value
                   },
-                  child: const Text('Selesai', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                  child: Text('Selesai', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -335,7 +336,7 @@ class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> wit
                     _cameraController!.startImageStream(_processCameraImage);
                   }
                 },
-                child: const Text('Coba Lagi', style: TextStyle(color: primaryColor)),
+                child: Text('Coba Lagi', style: TextStyle(color: primaryColor)),
               ),
             ],
           ),
@@ -583,7 +584,7 @@ class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> wit
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    _isFaceDetected ? 'Wajah Terdeteksi... Tahan!' : 'Posisikan wajah Anda di dalam oval...',
+                    _isFaceDetected ? 'Wajah Terdeteksi. Ketuk Tombol Absen!' : 'Posisikan wajah Anda di dalam oval...',
                     style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -619,6 +620,38 @@ class _LemburPresensiScreenState extends ConsumerState<LemburPresensiScreen> wit
                 ),
               );
             },
+          ),
+
+        if (_isCameraInitialized && _cameraController != null)
+          Positioned(
+            bottom: 40,
+            left: 40,
+            right: 40,
+            child: ElevatedButton.icon(
+              onPressed: (_isSubmitting || _isLocating || _currentPosition == null || !_isFaceDetected)
+                  ? null
+                  : _doSubmitAbsenLembur,
+              icon: const Icon(Icons.fingerprint_rounded, color: Colors.white, size: 24),
+              label: const Text(
+                'ABSEN LEMBUR SEKARANG',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 6,
+                shadowColor: primaryColor.withValues(alpha: 0.4),
+              ),
+            ),
           ),
       ],
     );

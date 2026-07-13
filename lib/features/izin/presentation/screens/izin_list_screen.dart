@@ -67,6 +67,7 @@ class IzinListScreen extends ConsumerWidget {
           ],
         ),
         child: FloatingActionButton.extended(
+          heroTag: null,
           onPressed: () => _showJenisIzinSelector(context),
           backgroundColor: Colors.transparent,
           elevation: 0,

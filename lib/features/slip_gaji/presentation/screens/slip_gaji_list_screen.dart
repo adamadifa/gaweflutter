@@ -31,6 +31,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
     final slipGajiList = ref.watch(slipGajiListProvider);
 
     return Scaffold(
@@ -44,7 +45,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
             fontSize: 18,
           ),
         ),
-        backgroundColor: const Color(0xFF32745e),
+        backgroundColor: primaryColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -56,7 +57,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
         onRefresh: () async {
           ref.invalidate(slipGajiListProvider);
         },
-        color: const Color(0xFF32745e),
+        color: primaryColor,
         child: slipGajiList.when(
           data: (periods) {
             final years = periods.map((e) => e.tahun).toSet().toList()..sort((a, b) => b.compareTo(a));
@@ -99,7 +100,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
                           ChoiceChip(
                             label: const Text('Semua'),
                             selected: _selectedYear == null,
-                            selectedColor: const Color(0xFF32745e),
+                            selectedColor: primaryColor,
                             labelStyle: TextStyle(
                               color: _selectedYear == null ? Colors.white : Colors.black87,
                               fontWeight: FontWeight.bold,
@@ -117,7 +118,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
                               child: ChoiceChip(
                                 label: Text('$year'),
                                 selected: _selectedYear == year,
-                                selectedColor: const Color(0xFF32745e),
+                                selectedColor: primaryColor,
                                 labelStyle: TextStyle(
                                   color: _selectedYear == year ? Colors.white : Colors.black87,
                                   fontWeight: FontWeight.bold,
@@ -157,7 +158,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 side: BorderSide(
-                                  color: const Color(0xFF32745e).withOpacity(0.15),
+                                  color: primaryColor.withValues(alpha: 0.15),
                                   width: 1,
                                 ),
                               ),
@@ -184,12 +185,12 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
                                         width: 50,
                                         height: 50,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF32745e).withOpacity(0.1),
+                                          color: primaryColor.withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.assignment_outlined,
-                                          color: Color(0xFF32745e),
+                                          color: primaryColor,
                                           size: 24,
                                         ),
                                       ),
@@ -228,10 +229,10 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
                                           ],
                                         ),
                                       ),
-                                      const Icon(
+                                      Icon(
                                         Icons.arrow_forward_ios,
                                         size: 16,
-                                        color: Color(0xFF32745e),
+                                        color: primaryColor,
                                       ),
                                     ],
                                   ),
@@ -244,8 +245,8 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
               ],
             );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: Color(0xFF32745e)),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: primaryColor),
           ),
           error: (err, stack) => Center(
             child: Padding(
@@ -264,7 +265,7 @@ class _SlipGajiListScreenState extends ConsumerState<SlipGajiListScreen> {
                   ElevatedButton(
                     onPressed: () => ref.invalidate(slipGajiListProvider),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF32745e),
+                      backgroundColor: primaryColor,
                     ),
                     child: const Text('Coba Lagi', style: TextStyle(color: Colors.white)),
                   ),

@@ -9,8 +9,6 @@ import 'package:gaweflutter/data/repositories/face_recognition_repository.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-const Color primaryColor = Color(0xFF32745e);
-
 class FaceRecognitionRegistrationScreen extends ConsumerStatefulWidget {
   const FaceRecognitionRegistrationScreen({super.key});
 
@@ -19,12 +17,14 @@ class FaceRecognitionRegistrationScreen extends ConsumerStatefulWidget {
 }
 
 class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognitionRegistrationScreen> with SingleTickerProviderStateMixin {
+  Color get primaryColor => Theme.of(context).primaryColor;
   // Screen States: 'loading', 'status', 'scanning', 'uploading', 'success'
   String _screenState = 'loading';
   
   bool _isRegistered = false;
   List<dynamic> _wajahList = [];
   String? _errorMessage;
+  String _cacheBuster = '';
 
   // Camera & Face Detection
   CameraController? _cameraController;
@@ -66,6 +66,7 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
 
   Future<void> _fetchRegistrationStatus() async {
     setState(() {
+      _cacheBuster = DateTime.now().millisecondsSinceEpoch.toString();
       _screenState = 'loading';
       _errorMessage = null;
     });
@@ -507,7 +508,7 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
   Widget _buildBody() {
     switch (_screenState) {
       case 'loading':
-        return const Center(
+        return Center(
           child: CircularProgressIndicator(color: primaryColor),
         );
       case 'status':
@@ -515,13 +516,13 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
       case 'scanning':
         return _buildScanningView();
       case 'uploading':
-        return const Center(
+        return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(color: primaryColor),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Mengunggah data wajah ke server...',
                 style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
               ),
@@ -590,10 +591,10 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
                   border: Border.all(color: primaryColor.withOpacity(0.2)),
                 ),
                 padding: const EdgeInsets.all(16),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.face_retouching_natural_rounded, color: primaryColor, size: 36),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -602,8 +603,8 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
                             'Wajah Terdaftar',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor),
                           ),
-                          SizedBox(height: 4),
-                          Text(
+                          const SizedBox(height: 4),
+                          const Text(
                             'Wajah Anda sudah berhasil didaftarkan di sistem.',
                             style: TextStyle(fontSize: 12, color: Colors.black54),
                           ),
@@ -651,7 +652,7 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
                       clipBehavior: Clip.antiAlias,
                       child: url != null
                           ? Image.network(
-                              url,
+                              url.contains('?') ? '$url&t=$_cacheBuster' : '$url?t=$_cacheBuster',
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.grey),
                             )
@@ -707,7 +708,7 @@ class _FaceRecognitionRegistrationScreenState extends ConsumerState<FaceRecognit
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(Icons.face_retouching_natural_rounded, size: 80, color: primaryColor),
+            Icon(Icons.face_retouching_natural_rounded, size: 80, color: primaryColor),
             const SizedBox(height: 24),
             const Text(
               'Belum Terdaftar',

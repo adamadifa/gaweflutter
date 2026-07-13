@@ -14,6 +14,7 @@ import 'package:gaweflutter/data/models/dashboard_model.dart';
 import 'package:gaweflutter/data/repositories/presensi_repository.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:gaweflutter/core/theme/app_theme_scheme.dart';
 
 class PresensiGpsScreen extends ConsumerStatefulWidget {
   final VoidCallback? onBackToHome;
@@ -520,11 +521,11 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF2D5A4C);
-    const Color primaryLightColor = Color(0xFF4E8A75);
-    const Color bodyBgColor = Color(0xFFE8F0ED);
-
     final dashboardAsync = ref.watch(dashboardProvider);
+    final themeScheme = dashboardAsync.value?.generalSetting?.mobileThemeScheme;
+    final primaryColor = AppThemeScheme.getPrimary(themeScheme);
+    final primaryLightColor = AppThemeScheme.getLight(themeScheme);
+    final bodyBgColor = AppThemeScheme.getBg(themeScheme);
 
     return Scaffold(
       backgroundColor: bodyBgColor,
@@ -828,7 +829,7 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: _isLocating || _currentPosition == null
-                                      ? const Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: primaryColor)))
+                                      ? Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: primaryColor)))
                                       : FlutterMap(
                                           mapController: _mapController,
                                           options: MapOptions(
@@ -886,7 +887,7 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                   if (dashboard.jamKerja != null) ...[
                     Container(
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [primaryColor, primaryLightColor],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
@@ -1020,9 +1021,9 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                       ),
                     )
                   else if (_isSubmitting)
-                    const Center(
+                    Center(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: CircularProgressIndicator(color: primaryColor),
                       ),
                     )
@@ -1068,7 +1069,7 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
               ),
             );
           },
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(color: primaryColor),
           ),
           error: (error, stack) => Center(

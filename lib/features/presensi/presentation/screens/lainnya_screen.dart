@@ -13,8 +13,8 @@ import 'package:gaweflutter/features/jadwal/presentation/screens/jadwal_screen.d
 import 'package:gaweflutter/features/tukar_shift/presentation/screens/tukar_shift_list_screen.dart';
 import 'package:gaweflutter/features/kpi/presentation/screens/kpi_screen.dart';
 import 'package:gaweflutter/features/presensi/presentation/screens/absen_istirahat_screen.dart';
+import 'package:gaweflutter/features/project/presentation/screens/projects_list_screen.dart';
 
-const Color primaryColor = Color(0xFF32745e);
 const Color bodyBgColor = Color(0xFFF8FAFC);
 
 class LainnyaScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class LainnyaScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Fitur $title segera hadir!'),
-        backgroundColor: primaryColor,
+        backgroundColor: Theme.of(context).primaryColor,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
@@ -40,6 +40,7 @@ class LainnyaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
     return Scaffold(
       backgroundColor: bodyBgColor,
       appBar: AppBar(
@@ -194,7 +195,7 @@ class LainnyaScreen extends StatelessWidget {
             subtitle: 'Pantau tugas & progress project',
             backgroundColor: const Color(0xFFE0F2FE),
             iconColor: const Color(0xFF0284C7),
-            onTap: () => _showComingSoon(context, 'Project Board'),
+            onTap: () => _navigateTo(context, const ProjectsListScreen()),
           ),
 
           const SizedBox(height: 24),

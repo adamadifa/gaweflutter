@@ -39,16 +39,16 @@ class KpiRemoteDataSourceImpl implements KpiRemoteDataSource {
         if (data['success'] == true) {
           return KpiResponseModel.fromJson(Map<String, dynamic>.from(data['data']));
         } else {
-          throw Exception(data['message'] ?? 'Gagal memuat data KPI');
+          return KpiResponseModel.error(data['message'] ?? 'Gagal memuat data KPI');
         }
       } else {
-        throw Exception('Server error: ${response.statusCode}');
+        return KpiResponseModel.error('Server error: ${response.statusCode}');
       }
     } on DioException catch (e) {
       final message = e.response?.data?['message'] ?? e.message ?? 'Terjadi kesalahan koneksi';
-      throw Exception(message);
+      return KpiResponseModel.error(message);
     } catch (e) {
-      throw Exception(e.toString());
+      return KpiResponseModel.error(e.toString().replaceAll('Exception: ', ''));
     }
   }
 

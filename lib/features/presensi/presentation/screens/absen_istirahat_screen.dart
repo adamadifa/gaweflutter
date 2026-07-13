@@ -13,6 +13,7 @@ import 'package:gaweflutter/features/dashboard/presentation/providers/dashboard_
 import 'package:gaweflutter/data/models/dashboard_model.dart';
 import 'package:gaweflutter/data/repositories/presensi_repository.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
+import 'package:gaweflutter/core/theme/app_theme_scheme.dart';
 
 class AbsenIstirahatScreen extends ConsumerStatefulWidget {
   final VoidCallback? onBackToHome;
@@ -301,10 +302,10 @@ class _AbsenIstirahatScreenState extends ConsumerState<AbsenIstirahatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF2D5A4C);
-    const Color bodyBgColor = Color(0xFFE8F0ED);
-
     final dashboardAsync = ref.watch(dashboardProvider);
+    final themeScheme = dashboardAsync.value?.generalSetting?.mobileThemeScheme;
+    final primaryColor = AppThemeScheme.getPrimary(themeScheme);
+    final bodyBgColor = AppThemeScheme.getBg(themeScheme);
 
     return Scaffold(
       backgroundColor: bodyBgColor,
@@ -597,7 +598,7 @@ class _AbsenIstirahatScreenState extends ConsumerState<AbsenIstirahatScreen> {
                             const Text('Jadwal Istirahat', style: TextStyle(fontSize: 13, color: Colors.grey)),
                             Text(
                               dashboard.jamKerja?.namaJamKerja ?? '-',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryColor),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryColor),
                             ),
                           ],
                         ),
@@ -671,7 +672,7 @@ class _AbsenIstirahatScreenState extends ConsumerState<AbsenIstirahatScreen> {
               ),
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator(color: primaryColor)),
+          loading: () => Center(child: CircularProgressIndicator(color: primaryColor)),
           error: (err, stack) => Center(child: Text('Terjadi kesalahan: $err')),
         ),
       ),

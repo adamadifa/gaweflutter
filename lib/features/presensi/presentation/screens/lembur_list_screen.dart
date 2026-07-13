@@ -5,8 +5,6 @@ import 'package:gaweflutter/features/presensi/presentation/screens/lembur_form_s
 import 'package:gaweflutter/features/presensi/presentation/screens/lembur_presensi_screen.dart';
 import 'package:intl/intl.dart';
 
-const Color primaryColor = Color(0xFF32745e);
-
 class LemburListScreen extends ConsumerStatefulWidget {
   const LemburListScreen({super.key});
 
@@ -15,6 +13,7 @@ class LemburListScreen extends ConsumerStatefulWidget {
 }
 
 class _LemburListScreenState extends ConsumerState<LemburListScreen> {
+  Color get primaryColor => Theme.of(context).primaryColor;
   bool _isLoading = true;
   List<dynamic> _lemburList = [];
   String? _errorMessage;
@@ -134,6 +133,7 @@ class _LemburListScreenState extends ConsumerState<LemburListScreen> {
       ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: () async {
           final result = await Navigator.push(
             context,
@@ -154,7 +154,7 @@ class _LemburListScreenState extends ConsumerState<LemburListScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: primaryColor));
+      return Center(child: CircularProgressIndicator(color: primaryColor));
     }
 
     if (_errorMessage != null) {
@@ -260,7 +260,7 @@ class _LemburListScreenState extends ConsumerState<LemburListScreen> {
                     item['keterangan'] ?? '-',
                     Icons.description_outlined,
                   ),
-                  if (status == 1) ...[
+                  if (status == 0 || status == 1) ...[
                     const SizedBox(height: 16),
                     _buildActionButton(idLembur, lemburIn, lemburOut),
                   ],
@@ -305,14 +305,18 @@ class _LemburListScreenState extends ConsumerState<LemburListScreen> {
         width: double.infinity,
         child: ElevatedButton.icon(
           onPressed: () => _navigateToAbsen(idLembur, 1),
-          icon: const Icon(Icons.login_rounded, size: 18),
-          label: const Text('Mulai Lembur (Absen Masuk)', style: TextStyle(fontWeight: FontWeight.bold)),
+          icon: const Icon(Icons.camera_front_rounded, size: 18, color: Colors.white),
+          label: const Text(
+            'MASUK PRESENSI LEMBUR',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 13, letterSpacing: 0.3),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            elevation: 0,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 4,
+            shadowColor: primaryColor.withValues(alpha: 0.25),
           ),
         ),
       );
@@ -321,30 +325,35 @@ class _LemburListScreenState extends ConsumerState<LemburListScreen> {
         width: double.infinity,
         child: ElevatedButton.icon(
           onPressed: () => _navigateToAbsen(idLembur, 2),
-          icon: const Icon(Icons.logout_rounded, size: 18),
-          label: const Text('Selesai Lembur (Absen Pulang)', style: TextStyle(fontWeight: FontWeight.bold)),
+          icon: const Icon(Icons.camera_front_rounded, size: 18, color: Colors.white),
+          label: const Text(
+            'PULANG PRESENSI LEMBUR',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 13, letterSpacing: 0.3),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.orange.shade700,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            elevation: 0,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 4,
+            shadowColor: Colors.orange.shade700.withValues(alpha: 0.25),
           ),
         ),
       );
     } else {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
+          color: Colors.green.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 18),
-            SizedBox(width: 6),
+            Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+            SizedBox(width: 8),
             Text(
               'Lembur Selesai & Tercatat',
               style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13),

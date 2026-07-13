@@ -74,6 +74,7 @@ class KpiResponseModel {
   final double totalScore;
   final double totalBobot;
   final List<KpiDetailModel> details;
+  final String? errorMessage;
 
   KpiResponseModel({
     required this.hasKpi,
@@ -83,7 +84,21 @@ class KpiResponseModel {
     required this.totalScore,
     required this.totalBobot,
     required this.details,
+    this.errorMessage,
   });
+
+  factory KpiResponseModel.error(String message) {
+    return KpiResponseModel(
+      hasKpi: false,
+      kpiId: 0,
+      period: KpiPeriodModel(id: 0, name: '', startDate: '', endDate: ''),
+      status: '',
+      totalScore: 0.0,
+      totalBobot: 0.0,
+      details: [],
+      errorMessage: message,
+    );
+  }
 
   factory KpiResponseModel.fromJson(Map<String, dynamic> json) {
     double parseDouble(dynamic val) {

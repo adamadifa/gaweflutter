@@ -7,9 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gaweflutter/data/repositories/kunjungan_repository.dart';
 
-const Color primaryColor = Color(0xFF32745e);
-const Color bodyBgColor = Color(0xFFE8F0ED);
-
 class KunjunganFormScreen extends ConsumerStatefulWidget {
   const KunjunganFormScreen({super.key});
 
@@ -18,6 +15,8 @@ class KunjunganFormScreen extends ConsumerStatefulWidget {
 }
 
 class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
+  Color get primaryColor => Theme.of(context).primaryColor;
+  Color get bodyBgColor => Theme.of(context).colorScheme.surface;
   final _formKey = GlobalKey<FormState>();
   final _deskripsiController = TextEditingController();
   final _lokasiController = TextEditingController();
@@ -141,7 +140,7 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(Icons.photo_library_rounded, color: primaryColor),
+                leading: Icon(Icons.photo_library_rounded, color: primaryColor),
                 title: const Text('Pilih dari Galeri'),
                 onTap: () {
                   Navigator.pop(context);
@@ -149,7 +148,7 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt_rounded, color: primaryColor),
+                leading: Icon(Icons.camera_alt_rounded, color: primaryColor),
                 title: const Text('Ambil dari Kamera'),
                 onTap: () {
                   Navigator.pop(context);
@@ -198,8 +197,8 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
       if (mounted) {
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data kunjungan berhasil dikirim!'),
+            SnackBar(
+              content: const Text('Data kunjungan berhasil dikirim!'),
               backgroundColor: primaryColor,
               behavior: SnackBarBehavior.floating,
             ),
@@ -236,18 +235,18 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
-      floatingLabelStyle: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+      floatingLabelStyle: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
       prefixIcon: Icon(prefixIcon, color: primaryColor, size: 20),
       suffixIcon: suffixIcon,
       filled: false,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        borderSide: BorderSide(color: primaryColor, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryColor, width: 2.2),
+        borderSide: BorderSide(color: primaryColor, width: 2.2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -295,10 +294,10 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
                     border: Border.all(color: primaryColor.withOpacity(0.2)),
                   ),
                   padding: const EdgeInsets.all(16),
-                  child: const Row(
+                  child: Row(
                     children: [
                       SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: primaryColor, strokeWidth: 2.5)),
-                      SizedBox(width: 14),
+                      const SizedBox(width: 14),
                       Expanded(
                         child: Text(
                           'Sedang membaca lokasi GPS Anda saat ini...',
@@ -358,7 +357,7 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
                   label: 'Koordinat Lokasi',
                   prefixIcon: Icons.map_rounded,
                   suffixIcon: IconButton(
-                    icon: const Icon(Icons.my_location, color: primaryColor),
+                    icon: Icon(Icons.my_location, color: primaryColor),
                     onPressed: _initLocationTracking,
                   ),
                 ),
@@ -412,11 +411,11 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: Image.file(_photoFile!, fit: BoxFit.cover),
                         )
-                      : const Column(
+                      : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.add_a_photo_outlined, size: 36, color: primaryColor),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               'Ambil Foto Bukti Lokasi Kunjungan',
                               style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryColor),
@@ -427,32 +426,19 @@ class _KunjunganFormScreenState extends ConsumerState<KunjunganFormScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ===== SUBMIT BUTTON =====
-              Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [primaryColor, Color(0xFF4E8A75)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
+              SizedBox(
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isSubmitting ? null : _submitForm,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
+                    elevation: 4,
+                    shadowColor: primaryColor.withOpacity(0.3),
                   ),
                   child: _isSubmitting
                       ? const SizedBox(

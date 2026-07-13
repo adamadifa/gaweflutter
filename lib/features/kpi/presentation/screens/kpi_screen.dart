@@ -154,7 +154,7 @@ class KpiScreen extends ConsumerWidget {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF32745e),
+                    backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
@@ -173,7 +173,7 @@ class KpiScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final kpiState = ref.watch(myKpiScoreProvider);
-    const primaryColor = Color(0xFF32745e);
+    final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -186,9 +186,9 @@ class KpiScreen extends ConsumerWidget {
             right: 0,
             height: 280,
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [primaryColor, Color(0xFF439075)],
+                  colors: [primaryColor, primaryColor.withValues(alpha: 0.8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -237,6 +237,32 @@ class KpiScreen extends ConsumerWidget {
                     // Title & Period Description
                     kpiState.when(
                       data: (res) {
+                        if (res.errorMessage != null) {
+                          return const Column(
+                            children: [
+                              Text(
+                                'EVALUASI KINERJA',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'KPI Tidak Aktif',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+
                         final totalScore = res.totalScore;
                         final totalBobot = res.totalBobot;
                         final percentage = totalBobot > 0 ? (totalScore / totalBobot) * 100 : 0.0;
@@ -285,7 +311,7 @@ class KpiScreen extends ConsumerWidget {
                           ],
                         );
                       },
-                      loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
+                      loading: () => const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5)),
                       error: (_, __) => const Center(
                         child: Text(
                           'Evaluasi Kinerja',
@@ -309,6 +335,51 @@ class KpiScreen extends ConsumerWidget {
               color: primaryColor,
               child: kpiState.when(
                 data: (res) {
+                  if (res.errorMessage != null) {
+                    return ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.assignment_late_outlined,
+                                    size: 64,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    res.errorMessage!,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Silakan hubungi pihak HRD atau Atasan Anda untuk mengaktifkan penilaian KPI periode ini.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF94A3B8),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
                   final list = res.details;
                   final statusColor = _getStatusColor(res.status);
 
@@ -520,7 +591,7 @@ class KpiScreen extends ConsumerWidget {
                                                   const SizedBox(width: 2),
                                                   GestureDetector(
                                                     onTap: () => _showEditRealisasiDialog(context, ref, res.kpiId, item),
-                                                    child: const Icon(
+                                                    child: Icon(
                                                       Icons.edit_outlined,
                                                       size: 14,
                                                       color: primaryColor,
@@ -571,13 +642,44 @@ class KpiScreen extends ConsumerWidget {
                     ],
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator(color: primaryColor)),
-                error: (err, _) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Text(err.toString(), style: const TextStyle(color: Colors.red)),
-                  ),
-                ),
+                loading: () => Center(child: CircularProgressIndicator(color: primaryColor, strokeWidth: 2.5)),
+                error: (err, _) {
+                  final errorMsg = err.toString().replaceAll('Exception: ', '');
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.assignment_late_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            errorMsg,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Silakan hubungi pihak HRD atau Atasan Anda untuk mengaktifkan penilaian KPI periode ini.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF94A3B8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),

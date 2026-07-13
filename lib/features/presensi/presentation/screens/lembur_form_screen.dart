@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gaweflutter/data/repositories/lembur_repository.dart';
 import 'package:intl/intl.dart';
 
-const Color primaryColor = Color(0xFF32745e);
-const Color bodyBgColor = Color(0xFFE8F0ED);
-
 class LemburFormScreen extends ConsumerStatefulWidget {
   const LemburFormScreen({super.key});
 
@@ -15,6 +12,8 @@ class LemburFormScreen extends ConsumerStatefulWidget {
 }
 
 class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
+  Color get primaryColor => Theme.of(context).primaryColor;
+  Color get bodyBgColor => Theme.of(context).colorScheme.surface;
   final _formKey = GlobalKey<FormState>();
   final _keteranganController = TextEditingController();
   final _startDateTimeController = TextEditingController();
@@ -43,10 +42,10 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
       lastDate: DateTime.now().add(const Duration(days: 90)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
+          colorScheme: ColorScheme.light(
             primary: primaryColor,
             onPrimary: Colors.white,
-            onSurface: Color(0xFF1E293B),
+            onSurface: const Color(0xFF1E293B),
           ),
         ),
         child: child!,
@@ -60,10 +59,10 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
         initialTime: _startTime ?? TimeOfDay.now(),
         builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: primaryColor,
               onPrimary: Colors.white,
-              onSurface: Color(0xFF1E293B),
+              onSurface: const Color(0xFF1E293B),
             ),
           ),
           child: child!,
@@ -104,10 +103,10 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
       lastDate: DateTime.now().add(const Duration(days: 90)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(
+          colorScheme: ColorScheme.light(
             primary: primaryColor,
             onPrimary: Colors.white,
-            onSurface: Color(0xFF1E293B),
+            onSurface: const Color(0xFF1E293B),
           ),
         ),
         child: child!,
@@ -121,10 +120,10 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
         initialTime: _endTime ?? _startTime ?? TimeOfDay.now(),
         builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: primaryColor,
               onPrimary: Colors.white,
-              onSurface: Color(0xFF1E293B),
+              onSurface: const Color(0xFF1E293B),
             ),
           ),
           child: child!,
@@ -201,8 +200,8 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
       if (mounted) {
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Pengajuan lembur berhasil dikirim!'),
+            SnackBar(
+              content: const Text('Pengajuan lembur berhasil dikirim!'),
               backgroundColor: primaryColor,
               behavior: SnackBarBehavior.floating,
             ),
@@ -239,18 +238,18 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w600),
-      floatingLabelStyle: const TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+      floatingLabelStyle: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
       prefixIcon: Icon(prefixIcon, color: primaryColor, size: 20),
       suffixIcon: suffixIcon,
       filled: false,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        borderSide: BorderSide(color: primaryColor, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryColor, width: 2.2),
+        borderSide: BorderSide(color: primaryColor, width: 2.2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -348,31 +347,19 @@ class _LemburFormScreenState extends ConsumerState<LemburFormScreen> {
               const SizedBox(height: 32),
 
               // ===== SUBMIT BUTTON =====
-              Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [primaryColor, Color(0xFF4E8A75)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
+              SizedBox(
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isSubmitting ? null : _submitForm,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
+                    elevation: 4,
+                    shadowColor: primaryColor.withOpacity(0.3),
                   ),
                   child: _isSubmitting
                       ? const SizedBox(

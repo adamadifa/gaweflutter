@@ -61,19 +61,25 @@ class DashboardModel {
 class GeneralSettingModel {
   final String namaPerusahaan;
   final String? logo;
+  final String? alamat;
   final int absenIstirahat;
+  final String mobileThemeScheme;
 
   GeneralSettingModel({
     required this.namaPerusahaan,
     this.logo,
+    this.alamat,
     required this.absenIstirahat,
+    required this.mobileThemeScheme,
   });
 
   factory GeneralSettingModel.fromJson(Map<String, dynamic> json) {
     return GeneralSettingModel(
       namaPerusahaan: json['nama_perusahaan'] as String? ?? 'E-Presensi',
       logo: json['logo'] as String?,
+      alamat: json['alamat'] as String?,
       absenIstirahat: DashboardModel._parseInt(json['absen_istirahat']) ?? 0,
+      mobileThemeScheme: json['mobile_theme_scheme'] as String? ?? 'green',
     );
   }
 }

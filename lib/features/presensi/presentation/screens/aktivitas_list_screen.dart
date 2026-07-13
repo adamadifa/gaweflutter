@@ -6,8 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as ll;
 
-const Color primaryColor = Color(0xFF32745e);
-
 class AktivitasListScreen extends ConsumerStatefulWidget {
   const AktivitasListScreen({super.key});
 
@@ -16,6 +14,7 @@ class AktivitasListScreen extends ConsumerStatefulWidget {
 }
 
 class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
+  Color get primaryColor => Theme.of(context).primaryColor;
   bool _isLoading = true;
   List<dynamic> _activityList = [];
   String? _errorMessage;
@@ -93,8 +92,8 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
       if (mounted) {
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Aktivitas berhasil dihapus'),
+            SnackBar(
+              content: const Text('Aktivitas berhasil dihapus'),
               backgroundColor: primaryColor,
               behavior: SnackBarBehavior.floating,
             ),
@@ -128,7 +127,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
       lastDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(primary: primaryColor),
+          colorScheme: ColorScheme.light(primary: primaryColor),
         ),
         child: child!,
       ),
@@ -153,7 +152,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.light(primary: primaryColor),
+          colorScheme: ColorScheme.light(primary: primaryColor),
         ),
         child: child!,
       ),
@@ -409,7 +408,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_today_rounded, size: 14, color: primaryColor),
+                          Icon(Icons.calendar_today_rounded, size: 14, color: primaryColor),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -438,7 +437,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_today_rounded, size: 14, color: primaryColor),
+                          Icon(Icons.calendar_today_rounded, size: 14, color: primaryColor),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -459,7 +458,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
           // Main list or states
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: primaryColor))
+                ? Center(child: CircularProgressIndicator(color: primaryColor))
                 : _errorMessage != null
                     ? Center(
                         child: Padding(
@@ -554,11 +553,11 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
                                                 children: [
                                                   Text(
                                                     dayStr,
-                                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
+                                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
                                                   ),
                                                   Text(
                                                     dayNum,
-                                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: primaryColor, height: 1.1),
+                                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: primaryColor, height: 1.1),
                                                   ),
                                                 ],
                                               ),
@@ -575,7 +574,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
                                                     children: [
                                                       Text(
                                                         item['jam'] ?? '',
-                                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: primaryColor),
+                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: primaryColor),
                                                       ),
                                                       Text(
                                                         item['tanggal_format'] ?? '',
@@ -583,19 +582,19 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
                                                       ),
                                                     ],
                                                   ),
-                                                  const SizedBox(height: 6),
+                                                  SizedBox(height: 6),
                                                   Text(
                                                     item['aktivitas'] ?? '-',
                                                     maxLines: 2,
                                                     overflow: TextOverflow.ellipsis,
-                                                    style: const TextStyle(fontSize: 13, color: Color(0xFF334155), fontWeight: FontWeight.w600),
+                                                    style: TextStyle(fontSize: 13, color: Color(0xFF334155), fontWeight: FontWeight.w600),
                                                   ),
                                                   if (item['lokasi'] != null && item['lokasi'].toString().isNotEmpty) ...[
-                                                    const SizedBox(height: 6),
+                                                    SizedBox(height: 6),
                                                     Row(
                                                       children: [
-                                                        const Icon(Icons.location_on_outlined, size: 12, color: primaryColor),
-                                                        const SizedBox(width: 4),
+                                                        Icon(Icons.location_on_outlined, size: 12, color: primaryColor),
+                                                        SizedBox(width: 4),
                                                         Text(
                                                           'Lihat Lokasi di Peta',
                                                           style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryColor.withOpacity(0.85)),
@@ -628,6 +627,7 @@ class _AktivitasListScreenState extends ConsumerState<AktivitasListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () async {
           final result = await Navigator.push(
             context,

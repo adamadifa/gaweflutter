@@ -27,19 +27,20 @@ class SlipGajiDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailState = ref.watch(slipGajiDetailProvider('$bulan-$tahun'));
+    final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Detail Slip Gaji',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        backgroundColor: const Color(0xFF32745e),
+        backgroundColor: primaryColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
@@ -50,7 +51,8 @@ class SlipGajiDetailScreen extends ConsumerWidget {
           detailState.maybeWhen(
             data: (detail) => IconButton(
               icon: const Icon(Icons.print, color: Colors.white),
-              onPressed: () => SlipGajiPdfHelper.printSlipGaji(detail, periodName),
+              onPressed: () =>
+                  SlipGajiPdfHelper.printSlipGaji(detail, periodName),
               tooltip: 'Cetak Slip Gaji',
             ),
             orElse: () => const SizedBox.shrink(),
@@ -67,8 +69,13 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                 // Top Header Info Card
                 Container(
                   width: double.infinity,
-                  color: const Color(0xFF32745e),
-                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 24, top: 8),
+                  color: primaryColor,
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 24,
+                    top: 8,
+                  ),
                   child: Column(
                     children: [
                       // Employee meta details
@@ -118,8 +125,8 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                             const SizedBox(height: 6),
                             Text(
                               _formatCurrency(detail.gajiBersih),
-                              style: const TextStyle(
-                                color: Color(0xFF32745e),
+                              style: TextStyle(
+                                color: primaryColor,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -161,6 +168,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                               'Hari Kerja',
                               '${detail.summary.hariKerja}',
                               Icons.calendar_month_outlined,
+                              primaryColor,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -169,6 +177,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                               'Kehadiran',
                               '${detail.summary.hariHadir}',
                               Icons.check_circle_outline,
+                              primaryColor,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -177,6 +186,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                               'Terlambat',
                               '${detail.summary.hariTerlambat}',
                               Icons.timer_outlined,
+                              primaryColor,
                               isWarning: detail.summary.hariTerlambat > 0,
                             ),
                           ),
@@ -186,6 +196,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                               'Lembur',
                               '${detail.summary.jamLembur}h',
                               Icons.schedule_outlined,
+                              primaryColor,
                             ),
                           ),
                         ],
@@ -196,15 +207,26 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                       _buildBreakdownCard(
                         title: 'I. Penerimaan',
                         icon: Icons.add_circle_outline,
-                        iconColor: const Color(0xFF32745e),
+                        iconColor: primaryColor,
                         total: detail.totalPenerimaan,
                         items: [
-                          _buildDetailRow('Gaji Pokok', detail.penerimaan.gajiPokok),
-                          ...detail.penerimaan.tunjangan.map((t) => _buildDetailRow(t.nama, t.jumlah)),
+                          _buildDetailRow(
+                            'Gaji Pokok',
+                            detail.penerimaan.gajiPokok,
+                          ),
+                          ...detail.penerimaan.tunjangan.map(
+                            (t) => _buildDetailRow(t.nama, t.jumlah),
+                          ),
                           if (detail.penerimaan.tunjanganPajak > 0)
-                            _buildDetailRow('Tunjangan PPh 21', detail.penerimaan.tunjanganPajak),
+                            _buildDetailRow(
+                              'Tunjangan PPh 21',
+                              detail.penerimaan.tunjanganPajak,
+                            ),
                           if (detail.penerimaan.upahLembur > 0)
-                            _buildDetailRow('Upah Lembur', detail.penerimaan.upahLembur),
+                            _buildDetailRow(
+                              'Upah Lembur',
+                              detail.penerimaan.upahLembur,
+                            ),
                           if (detail.penerimaan.penambah > 0)
                             _buildDetailRow(
                               detail.penerimaan.keteranganPenyesuaian.isNotEmpty
@@ -224,19 +246,40 @@ class SlipGajiDetailScreen extends ConsumerWidget {
                         total: detail.totalPotongan,
                         items: [
                           if (detail.potongan.potonganJam > 0)
-                            _buildDetailRow('Potongan Jam', detail.potongan.potonganJam),
+                            _buildDetailRow(
+                              'Potongan Jam',
+                              detail.potongan.potonganJam,
+                            ),
                           if (detail.potongan.denda > 0)
-                            _buildDetailRow('Denda Keterlambatan', detail.potongan.denda),
+                            _buildDetailRow(
+                              'Denda Keterlambatan',
+                              detail.potongan.denda,
+                            ),
                           if (detail.potongan.bpjsKesehatan > 0)
-                            _buildDetailRow('BPJS Kesehatan', detail.potongan.bpjsKesehatan),
+                            _buildDetailRow(
+                              'BPJS Kesehatan',
+                              detail.potongan.bpjsKesehatan,
+                            ),
                           if (detail.potongan.bpjsTenagakerja > 0)
-                            _buildDetailRow('BPJS Ketenagakerjaan', detail.potongan.bpjsTenagakerja),
+                            _buildDetailRow(
+                              'BPJS Ketenagakerjaan',
+                              detail.potongan.bpjsTenagakerja,
+                            ),
                           if (detail.potongan.cicilanPinjaman > 0)
-                            _buildDetailRow('Cicilan Pinjaman', detail.potongan.cicilanPinjaman),
+                            _buildDetailRow(
+                              'Cicilan Pinjaman',
+                              detail.potongan.cicilanPinjaman,
+                            ),
                           if (detail.potongan.potonganPph21 > 0)
-                            _buildDetailRow('Potongan PPh 21', detail.potongan.potonganPph21),
+                            _buildDetailRow(
+                              'Potongan PPh 21',
+                              detail.potongan.potonganPph21,
+                            ),
                           if (detail.potongan.pengurang > 0)
-                            _buildDetailRow('Potongan Lainnya', detail.potongan.pengurang),
+                            _buildDetailRow(
+                              'Potongan Lainnya',
+                              detail.potongan.pengurang,
+                            ),
                         ],
                         isDeduction: true,
                       ),
@@ -248,39 +291,48 @@ class SlipGajiDetailScreen extends ConsumerWidget {
             ),
           );
         },
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: Color(0xFF32745e)),
-          ),
-          error: (err, stack) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    err.toString().replaceAll('Exception: ', ''),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red),
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: primaryColor)),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(
+                  err.toString().replaceAll('Exception: ', ''),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.red),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () =>
+                      ref.invalidate(slipGajiDetailProvider('$bulan-$tahun')),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => ref.invalidate(slipGajiDetailProvider('$bulan-$tahun')),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF32745e),
-                    ),
-                    child: const Text('Coba Lagi', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Coba Lagi',
+                    style: TextStyle(color: Colors.white),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 
-  Widget _buildSummaryCard(String label, String value, IconData icon, {bool isWarning = false}) {
+  Widget _buildSummaryCard(
+    String label,
+    String value,
+    IconData icon,
+    Color primaryColor, {
+    bool isWarning = false,
+  }) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -297,11 +349,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: isWarning ? Colors.amber : const Color(0xFF32745e),
-          ),
+          Icon(icon, size: 16, color: isWarning ? Colors.amber : primaryColor),
           const SizedBox(height: 4),
           Text(
             value,
@@ -314,10 +362,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 9,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 9, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
         ],
@@ -342,10 +387,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Colors.grey.withValues(alpha: 0.15),
-          width: 1,
-        ),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.15), width: 1),
       ),
       color: Colors.white,
       child: Padding(
@@ -410,10 +452,7 @@ class SlipGajiDetailScreen extends ConsumerWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
           Text(
             _formatCurrency(amount),
