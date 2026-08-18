@@ -3,11 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gaweflutter/core/constants/app_constants.dart';
 import 'package:gaweflutter/core/storage/secure_storage.dart';
+import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
 
 class DioClient {
   final Dio _dio;
+  final Ref _ref;
 
-  DioClient()
+  DioClient(this._ref)
       : _dio = Dio(
           BaseOptions(
             baseUrl: AppConstants.baseUrl,
@@ -15,6 +17,9 @@ class DioClient {
             receiveTimeout: AppConstants.receiveTimeout,
             contentType: Headers.jsonContentType,
             responseType: ResponseType.json,
+            headers: {
+              'Accept': 'application/json',
+            },
           ),
         ) {
     _dio.interceptors.add(
@@ -41,6 +46,14 @@ class DioClient {
           return handler.next(response);
         },
         onError: (DioException e, handler) {
+          if (e.response?.statusCode == 401) {
+            // Token invalid or expired, force logout
+            // Avoid infinite loop if the failed request itself is logout
+            final requestPath = e.requestOptions.path;
+            if (requestPath != '/logout') {
+              _ref.read(authProvider.notifier).logout();
+            }
+          }
           if (kDebugMode) {
             print('<-- ERROR: ${e.message}');
             print('Error Response: ${e.response?.data}');
@@ -54,6 +67,6 @@ class DioClient {
   Dio get dio => _dio;
 }
 
-final dioClientProvider = Provider<DioClient>((ref) => DioClient());
+final dioClientProvider = Provider<DioClient>((ref) => DioClient(ref));
 final dioProvider = Provider<Dio>((ref) => ref.watch(dioClientProvider).dio);
 

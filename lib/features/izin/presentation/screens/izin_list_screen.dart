@@ -50,34 +50,13 @@ class IzinListScreen extends ConsumerWidget {
           error: (err, stack) => _buildErrorState(ref, err.toString(), primaryColor),
         ),
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2D5A4C), Color(0xFF4E8A75)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          heroTag: null,
-          onPressed: () => _showJenisIzinSelector(context),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          highlightElevation: 0,
-          label: const Text(
-            'Buat Ajuan',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.3),
-          ),
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
-        ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        onPressed: () => _showJenisIzinSelector(context),
+        backgroundColor: primaryColor,
+        elevation: 4,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
   }
@@ -198,41 +177,53 @@ class IzinListScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ===== SUMMARY CARDS =====
+          // ===== COMPACT SUMMARY BAR =====
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildSummaryCard(
-                    title: 'Total Ajuan',
-                    count: total.toString(),
-                    icon: Icons.assignment_outlined,
-                    iconColor: primaryColor,
-                    bgColor: Colors.white,
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+                border: Border.all(color: const Color(0xFFF1F5F9)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildCompactStatItem(
+                      title: 'Total Ajuan',
+                      count: total.toString(),
+                      icon: Icons.assignment_outlined,
+                      iconColor: primaryColor,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildSummaryCard(
-                    title: 'Disetujui',
-                    count: approved.toString(),
-                    icon: Icons.check_circle_outline_rounded,
-                    iconColor: const Color(0xFF10B981),
-                    bgColor: Colors.white,
+                  _buildVerticalDivider(),
+                  Expanded(
+                    child: _buildCompactStatItem(
+                      title: 'Disetujui',
+                      count: approved.toString(),
+                      icon: Icons.check_circle_outline_rounded,
+                      iconColor: const Color(0xFF10B981),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildSummaryCard(
-                    title: 'Pending',
-                    count: pending.toString(),
-                    icon: Icons.pending_actions_rounded,
-                    iconColor: const Color(0xFFF59E0B),
-                    bgColor: Colors.white,
+                  _buildVerticalDivider(),
+                  Expanded(
+                    child: _buildCompactStatItem(
+                      title: 'Pending',
+                      count: pending.toString(),
+                      icon: Icons.pending_actions_rounded,
+                      iconColor: const Color(0xFFF59E0B),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -261,49 +252,59 @@ class IzinListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard({
+  Widget _buildVerticalDivider() {
+    return Container(
+      height: 24,
+      width: 1,
+      color: const Color(0xFFE2E8F0),
+    );
+  }
+
+  Widget _buildCompactStatItem({
     required String title,
     required String count,
     required IconData icon,
     required Color iconColor,
-    required Color bgColor,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-        border: Border.all(color: Colors.grey[100]!),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: iconColor, size: 20),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.08),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(height: 8),
-          Text(
-            count,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF1E293B)),
+          child: Icon(icon, color: iconColor, size: 16),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                count,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Color(0xFF64748B),
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 10, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -377,184 +378,175 @@ class IzinListScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E293B).withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF1E293B).withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           )
         ],
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                width: 5,
-                color: typeColor,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row: Type Badge and Status Badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Type Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: typeColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: typeColor.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(typeIcon, color: typeColor, size: 15),
-                              ),
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    typeLabel,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E293B)),
-                                  ),
-                                  const SizedBox(height: 1),
-                                  Text(
-                                    '$totalDays Hari',
-                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: statusBg,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(statusIcon, color: statusFg, size: 12),
-                                const SizedBox(width: 4),
-                                Text(
-                                  statusText,
-                                  style: TextStyle(color: statusFg, fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_month_outlined, size: 14, color: Color(0xFF64748B)),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              dateRangeStr,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFF1F5F9)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Alasan / Keterangan:',
-                              style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              item.keterangan,
-                              style: const TextStyle(fontSize: 11, color: Color(0xFF334155), height: 1.4),
-                            ),
-                          ],
+                      Icon(typeIcon, color: typeColor, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        typeLabel,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                          color: typeColor,
                         ),
                       ),
-                      // Action buttons row (Attachment / Cancel)
-                      if (item.docSidUrl != null || (item.status == 0 && item.ket != 'k')) ...[
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            if (item.docSidUrl != null) ...[
-                              InkWell(
-                                onTap: () {
-                                  _showImageDialog(context, item.docSidUrl!);
-                                },
-                                borderRadius: BorderRadius.circular(8),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: primaryColor.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: primaryColor.withOpacity(0.15)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.attach_file_rounded, size: 14, color: primaryColor),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Lihat Lampiran (SID)',
-                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                            if (item.status == 0 && item.ket != 'k') ...[
-                              InkWell(
-                                onTap: () {
-                                  _showCancelConfirmationDialog(context, ref, item.kode);
-                                },
-                                borderRadius: BorderRadius.circular(8),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.red.withOpacity(0.15)),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.delete_outline_rounded, size: 14, color: Colors.red),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'Batalkan',
-                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
                     ],
                   ),
                 ),
+                // Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(statusIcon, color: statusFg, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        statusText,
+                        style: TextStyle(color: statusFg, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            // Date & Days count Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_month_outlined, size: 16, color: Color(0xFF64748B)),
+                    const SizedBox(width: 8),
+                    Text(
+                      dateRangeStr,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                    ),
+                  ],
+                ),
+                Text(
+                  '$totalDays Hari',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Reason / Alasan
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFF1F5F9)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'KETERANGAN / ALASAN',
+                    style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.keterangan,
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF475569), height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+            // Action buttons row (Attachment / Cancel)
+            if (item.docSidUrl != null || (item.status == 0 && item.ket != 'k')) ...[
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  if (item.docSidUrl != null) ...[
+                    InkWell(
+                      onTap: () {
+                        _showImageDialog(context, item.docSidUrl!);
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: primaryColor.withOpacity(0.15)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.attach_file_rounded, size: 14, color: primaryColor),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Lihat Lampiran (SID)',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  if (item.status == 0 && item.ket != 'k') ...[
+                    InkWell(
+                      onTap: () {
+                        _showCancelConfirmationDialog(context, ref, item.kode);
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.red.withOpacity(0.15)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.delete_outline_rounded, size: 14, color: Colors.red),
+                            SizedBox(width: 6),
+                            Text(
+                              'Batalkan',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
-          ),
+          ],
         ),
       ),
     );

@@ -24,17 +24,23 @@ class PelanggaranModel {
   });
 
   factory PelanggaranModel.fromJson(Map<String, dynamic> json) {
+    // keterangan can come as a List<String> or a plain String from the API
+    final rawKet = json['keterangan'];
+    final keteranganStr = rawKet is List
+        ? rawKet.map((e) => e.toString()).join(', ')
+        : (rawKet?.toString() ?? '');
+
     return PelanggaranModel(
-      noSp: json['no_sp'] ?? '',
-      noDokumen: json['no_dokumen'],
-      tanggal: json['tanggal'],
-      dari: json['dari'],
-      sampai: json['sampai'],
-      jenisSp: json['jenis_sp'] ?? '',
-      keterangan: json['keterangan'] ?? '',
-      namaJabatan: json['nama_jabatan'] ?? '',
-      namaCabang: json['nama_cabang'] ?? '',
-      namaDept: json['nama_dept'] ?? '',
+      noSp: json['no_sp']?.toString() ?? '',
+      noDokumen: json['no_dokumen']?.toString(),
+      tanggal: json['tanggal']?.toString(),
+      dari: json['dari']?.toString(),
+      sampai: json['sampai']?.toString(),
+      jenisSp: json['jenis_sp']?.toString() ?? '',
+      keterangan: keteranganStr,
+      namaJabatan: json['nama_jabatan']?.toString() ?? '',
+      namaCabang: json['nama_cabang']?.toString() ?? '',
+      namaDept: json['nama_dept']?.toString() ?? '',
     );
   }
 }
@@ -73,21 +79,27 @@ class PelanggaranDetailModel {
   });
 
   factory PelanggaranDetailModel.fromJson(Map<String, dynamic> json) {
+    // keterangan can come as a List<String> or a plain String from the API
+    final rawKet = json['keterangan'];
+    final keteranganStr = rawKet is List
+        ? rawKet.map((e) => e.toString()).join(', ')
+        : (rawKet?.toString() ?? '');
+
     return PelanggaranDetailModel(
-      noSp: json['no_sp'] ?? '',
-      noDokumen: json['no_dokumen'],
-      tanggal: json['tanggal'],
-      dari: json['dari'],
-      sampai: json['sampai'],
-      jenisSp: json['jenis_sp'] ?? '',
-      keterangan: json['keterangan'] ?? '',
-      namaKaryawan: json['nama_karyawan'] ?? '',
-      nikShow: json['nik_show'] ?? '',
-      alamat: json['alamat'],
-      namaJabatan: json['nama_jabatan'] ?? '',
-      namaCabang: json['nama_cabang'] ?? '',
-      namaDept: json['nama_dept'] ?? '',
-      namaPerusahaan: json['nama_perusahaan'],
+      noSp: json['no_sp']?.toString() ?? '',
+      noDokumen: json['no_dokumen']?.toString(),
+      tanggal: json['tanggal']?.toString(),
+      dari: json['dari']?.toString(),
+      sampai: json['sampai']?.toString(),
+      jenisSp: json['jenis_sp']?.toString() ?? '',
+      keterangan: keteranganStr,
+      namaKaryawan: json['nama_karyawan']?.toString() ?? '',
+      nikShow: json['nik_show']?.toString() ?? '',
+      alamat: json['alamat']?.toString(),
+      namaJabatan: json['nama_jabatan']?.toString() ?? '',
+      namaCabang: json['nama_cabang']?.toString() ?? '',
+      namaDept: json['nama_dept']?.toString() ?? '',
+      namaPerusahaan: json['nama_perusahaan']?.toString(),
     );
   }
 }

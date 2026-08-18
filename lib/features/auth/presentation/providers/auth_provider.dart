@@ -74,7 +74,11 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> logout() async {
     final repository = ref.read(authRepositoryProvider);
-    await repository.logout();
+    try {
+      await repository.logout();
+    } catch (_) {
+      // Ignore network errors during logout
+    }
     state = AuthState.unauthenticated();
   }
 

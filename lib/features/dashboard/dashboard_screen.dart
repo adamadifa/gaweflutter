@@ -901,7 +901,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             childAspectRatio: 0.95,
                             children: [
                               _buildGridMenu(
-                                Icons.card_membership_rounded,
+                                'idcard',
                                 'ID Card',
                                 primaryColor,
                                 onTap: () {
@@ -914,7 +914,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                               _buildGridMenu(
-                                Icons.coffee_rounded,
+                                'istirahat',
                                 'Istirahat',
                                 primaryColor,
                                 onTap: () {
@@ -927,7 +927,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                               _buildGridMenu(
-                                Icons.more_time_rounded,
+                                'lembur',
                                 'Lembur',
                                 primaryColor,
                                 onTap: () {
@@ -940,7 +940,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                               _buildGridMenu(
-                                Icons.payments_rounded,
+                                'slipgaji',
                                 'Slip Gaji',
                                 primaryColor,
                                 onTap: () {
@@ -953,7 +953,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                                _buildGridMenu(
-                                Icons.trending_up_rounded,
+                                'aktivitas',
                                 'Aktivitas',
                                 primaryColor,
                                 onTap: () {
@@ -966,7 +966,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                               _buildGridMenu(
-                                Icons.map_rounded,
+                                'visit',
                                 'Visit',
                                 primaryColor,
                                 onTap: () {
@@ -979,7 +979,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                               _buildGridMenu(
-                                Icons.face_retouching_natural_rounded,
+                                'wajah',
                                 'Wajah',
                                 primaryColor,
                                 onTap: () {
@@ -992,7 +992,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 },
                               ),
                                _buildGridMenu(
-                                Icons.grid_view_rounded,
+                                'lainnya',
                                 'Lainnya',
                                 primaryColor,
                                 onTap: () {
@@ -1315,7 +1315,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildGridMenu(IconData icon, String label, Color color, {VoidCallback? onTap}) {
+  Widget _buildGridMenu(String imageName, String label, Color color, {VoidCallback? onTap}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1338,14 +1338,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 32, color: color),
+            Image.asset(
+              'assets/images/3d/$imageName.png',
+              width: 38,
+              height: 38,
+              errorBuilder: (context, error, stackTrace) {
+                // Fallback to standard icons if assets aren't copied yet
+                IconData fallbackIcon;
+                switch (imageName) {
+                  case 'idcard': fallbackIcon = Icons.card_membership_rounded; break;
+                  case 'istirahat': fallbackIcon = Icons.coffee_rounded; break;
+                  case 'lembur': fallbackIcon = Icons.more_time_rounded; break;
+                  case 'slipgaji': fallbackIcon = Icons.payments_rounded; break;
+                  case 'aktivitas': fallbackIcon = Icons.trending_up_rounded; break;
+                  case 'visit': fallbackIcon = Icons.map_rounded; break;
+                  case 'wajah': fallbackIcon = Icons.face_retouching_natural_rounded; break;
+                  default: fallbackIcon = Icons.grid_view_rounded;
+                }
+                return Icon(fallbackIcon, size: 32, color: color);
+              },
+            ),
             const SizedBox(height: 8),
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: color,
+                color: Color(0xFF1E293B),
               ),
             ),
           ],

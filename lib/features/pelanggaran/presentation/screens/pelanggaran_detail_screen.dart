@@ -136,13 +136,11 @@ class _PelanggaranDetailScreenState extends ConsumerState<PelanggaranDetailScree
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Warning Header Badge
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   decoration: BoxDecoration(
                     color: spColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: spColor.withOpacity(0.2)),
                   ),
                   child: Row(
                     children: [
@@ -195,11 +193,6 @@ class _PelanggaranDetailScreenState extends ConsumerState<PelanggaranDetailScree
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Top indicator line
-                      Container(
-                        height: 6,
-                        color: spColor,
-                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                         child: Column(
