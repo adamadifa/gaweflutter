@@ -22,6 +22,9 @@ import 'package:gaweflutter/features/presensi/presentation/screens/aktivitas_lis
 import 'package:gaweflutter/features/presensi/presentation/screens/lainnya_screen.dart';
 import 'package:gaweflutter/features/presensi/presentation/screens/absen_istirahat_screen.dart';
 import 'package:gaweflutter/features/presensi/presentation/screens/lembur_presensi_screen.dart';
+import 'package:gaweflutter/features/pengumuman/presentation/screens/pengumuman_list_screen.dart';
+import 'package:gaweflutter/features/pengumuman/presentation/screens/pengumuman_detail_screen.dart';
+import 'package:gaweflutter/features/approval/presentation/screens/approval_list_screen.dart';
 import 'package:gaweflutter/core/theme/app_theme_scheme.dart';
 
 
@@ -995,6 +998,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 'lainnya',
                                 'Lainnya',
                                 primaryColor,
+                                icon: Icons.grid_view_rounded,
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -1145,6 +1149,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<Widget> _buildAlertSlides(DashboardModel dashboard) {
     final List<Widget> slides = [];
 
+    // 0. Pending Approval alert (Delegasi)
+    if (dashboard.hasApprovalAccess && dashboard.pendingApprovalCount > 0) {
+      slides.add(_buildAlertCard(
+        title: 'Hak Approval Menunggu',
+        content: 'Terdapat ${dashboard.pendingApprovalCount} pengajuan karyawan yang menunggu persetujuan Anda.',
+        subtext: 'Ketuk untuk membuka daftar approval delegasi.',
+        icon: Icons.done_all_rounded,
+        bgColor: const Color(0xFFCCFBF1),
+        borderColor: const Color(0xFF99F6E4),
+        textColor: const Color(0xFF0F766E),
+        iconColor: const Color(0xFF0F766E),
+        iconBgColor: const Color(0x330F766E),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ApprovalListScreen(),
+            ),
+          );
+        },
+      ));
+    }
+
     // 1. Contract alert
     if (dashboard.notifKontrak != null) {
       slides.add(_buildAlertCard(
@@ -1187,6 +1214,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         textColor: const Color(0xFF0C5460),
         iconColor: const Color(0xFF007BFF),
         iconBgColor: const Color(0x33007BFF),
+        onTap: () {
+          if (dashboard.announcement?.id != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PengumumanDetailScreen(pengumumanId: dashboard.announcement!.id!),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PengumumanListScreen(),
+              ),
+            );
+          }
+        },
       ));
     }
 
@@ -1213,71 +1257,76 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     required Color textColor,
     required Color iconColor,
     required Color iconBgColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: borderColor),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Icon Box
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconBgColor,
-              shape: BoxShape.circle,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: borderColor),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon Box
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: iconBgColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 20, color: iconColor),
             ),
-            child: Icon(icon, size: 20, color: iconColor),
-          ),
-          const SizedBox(width: 12),
-          // Text Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Expanded(
-                  child: Text(
-                    content,
+            const SizedBox(width: 12),
+            // Text Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
                     style: TextStyle(
-                      fontSize: 11,
-                      color: textColor.withValues(alpha: 0.85),
-                      height: 1.3,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                Text(
-                  subtext,
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: textColor.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(height: 2),
+                  Expanded(
+                    child: Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: textColor.withValues(alpha: 0.85),
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  Text(
+                    subtext,
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: textColor.withValues(alpha: 0.6),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1315,7 +1364,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildGridMenu(String imageName, String label, Color color, {VoidCallback? onTap}) {
+  Widget _buildGridMenu(String imageName, String label, Color color, {VoidCallback? onTap, IconData? icon}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1338,26 +1387,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/3d/$imageName.png',
-              width: 38,
-              height: 38,
-              errorBuilder: (context, error, stackTrace) {
-                // Fallback to standard icons if assets aren't copied yet
-                IconData fallbackIcon;
-                switch (imageName) {
-                  case 'idcard': fallbackIcon = Icons.card_membership_rounded; break;
-                  case 'istirahat': fallbackIcon = Icons.coffee_rounded; break;
-                  case 'lembur': fallbackIcon = Icons.more_time_rounded; break;
-                  case 'slipgaji': fallbackIcon = Icons.payments_rounded; break;
-                  case 'aktivitas': fallbackIcon = Icons.trending_up_rounded; break;
-                  case 'visit': fallbackIcon = Icons.map_rounded; break;
-                  case 'wajah': fallbackIcon = Icons.face_retouching_natural_rounded; break;
-                  default: fallbackIcon = Icons.grid_view_rounded;
-                }
-                return Icon(fallbackIcon, size: 32, color: color);
-              },
-            ),
+            if (icon != null)
+              SizedBox(
+                width: 38,
+                height: 38,
+                child: Center(
+                  child: Icon(icon, size: 32, color: color),
+                ),
+              )
+            else
+              Image.asset(
+                'assets/images/3d/$imageName.png',
+                width: 38,
+                height: 38,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback to standard icons if assets aren't copied yet
+                  IconData fallbackIcon;
+                  switch (imageName) {
+                    case 'idcard': fallbackIcon = Icons.card_membership_rounded; break;
+                    case 'istirahat': fallbackIcon = Icons.coffee_rounded; break;
+                    case 'lembur': fallbackIcon = Icons.more_time_rounded; break;
+                    case 'slipgaji': fallbackIcon = Icons.payments_rounded; break;
+                    case 'aktivitas': fallbackIcon = Icons.trending_up_rounded; break;
+                    case 'visit': fallbackIcon = Icons.map_rounded; break;
+                    case 'wajah': fallbackIcon = Icons.face_retouching_natural_rounded; break;
+                    default: fallbackIcon = Icons.grid_view_rounded;
+                  }
+                  return Icon(fallbackIcon, size: 32, color: color);
+                },
+              ),
             const SizedBox(height: 8),
             Text(
               label,

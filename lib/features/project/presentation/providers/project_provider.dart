@@ -11,3 +11,9 @@ final projectDetailProvider = FutureProvider.autoDispose.family<ProjectDetailRes
   final repository = ref.watch(projectRepositoryProvider);
   return repository.getProjectDetail(projectId);
 });
+
+final taskDetailProvider = FutureProvider.autoDispose.family<ProjectTaskDetailModel, int>((ref, taskId) async {
+  final repository = ref.watch(projectRepositoryProvider);
+  return repository.getTaskDetail(taskId);
+});
+

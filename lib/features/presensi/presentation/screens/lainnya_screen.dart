@@ -14,6 +14,8 @@ import 'package:gaweflutter/features/tukar_shift/presentation/screens/tukar_shif
 import 'package:gaweflutter/features/kpi/presentation/screens/kpi_screen.dart';
 import 'package:gaweflutter/features/presensi/presentation/screens/absen_istirahat_screen.dart';
 import 'package:gaweflutter/features/project/presentation/screens/projects_list_screen.dart';
+import 'package:gaweflutter/features/pengumuman/presentation/screens/pengumuman_list_screen.dart';
+import 'package:gaweflutter/features/approval/presentation/screens/approval_list_screen.dart';
 
 const Color bodyBgColor = Color(0xFFF8FAFC);
 
@@ -230,7 +232,7 @@ class LainnyaScreen extends StatelessWidget {
             subtitle: 'Persetujuan Pengajuan',
             backgroundColor: const Color(0xFFCCFBF1),
             iconColor: const Color(0xFF0F766E),
-            onTap: () => _showComingSoon(context, 'Hak Approval'),
+            onTap: () => _navigateTo(context, const ApprovalListScreen()),
           ),
 
           const SizedBox(height: 24),
@@ -245,7 +247,7 @@ class LainnyaScreen extends StatelessWidget {
             subtitle: 'Pusat Informasi Perusahaan',
             backgroundColor: const Color(0xFFFDF4FF),
             iconColor: const Color(0xFFA21CAF),
-            onTap: () => _showComingSoon(context, 'Pengumuman'),
+            onTap: () => _navigateTo(context, const PengumumanListScreen()),
           ),
           const SizedBox(height: 24),
         ],

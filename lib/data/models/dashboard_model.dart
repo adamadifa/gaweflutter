@@ -13,6 +13,8 @@ class DashboardModel {
   final JamKerjaInfoModel? jamKerja;
   final GeneralSettingModel? generalSetting;
   final List<RiwayatModel> history;
+  final bool hasApprovalAccess;
+  final int pendingApprovalCount;
 
   DashboardModel({
     this.attendance,
@@ -27,6 +29,8 @@ class DashboardModel {
     this.jamKerja,
     this.generalSetting,
     required this.history,
+    this.hasApprovalAccess = false,
+    this.pendingApprovalCount = 0,
   });
 
   static int? _parseInt(dynamic value) {
@@ -54,6 +58,8 @@ class DashboardModel {
       jamKerja: json['jam_kerja'] != null ? JamKerjaInfoModel.fromJson(json['jam_kerja']) : null,
       generalSetting: json['general_setting'] != null ? GeneralSettingModel.fromJson(json['general_setting']) : null,
       history: historyObjs,
+      hasApprovalAccess: json['has_approval_access'] as bool? ?? false,
+      pendingApprovalCount: _parseInt(json['pending_approval_count']) ?? 0,
     );
   }
 }
