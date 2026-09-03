@@ -201,27 +201,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF2D5A4C);
-    const Color bodyBgColor = Color(0xFFE8F0ED);
+    const Color primaryColor = Color(0xFF1E6152); // Brand deep green
+    const Color bodyBgColor = Color(0xFFF9FBFA);
     final profileState = ref.watch(profileProvider);
-
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ));
 
     return Scaffold(
       backgroundColor: bodyBgColor,
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text(
-          'Profil Saya',
-          style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 18, letterSpacing: -0.5),
+          'Pengaturan & Profil',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            fontSize: 17,
+            letterSpacing: 0.1,
+          ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
         systemOverlayStyle: SystemUiOverlayStyle.light,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded, size: 22, color: Colors.white),
+            tooltip: 'Segarkan',
+            onPressed: () => ref.invalidate(profileProvider),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(profileProvider),
@@ -233,207 +241,242 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // ===== HERO GRADIENT CONTAINER =====
+                  // ===== PROFILE BANNER INTEGRATED WITH HEADER =====
                   Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0xFF2D5A4C), Color(0xFF1B3D33)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(24),
+                        bottomRight: Radius.circular(24),
                       ),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 15,
-                          offset: Offset(0, 5),
-                        )
-                      ],
                     ),
-                    padding: const EdgeInsets.fromLTRB(20, 110, 20, 35),
-                    child: Column(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                    child: Row(
                       children: [
-                        // Avatar area with glass pulse
+                        // Avatar with camera badge
                         Stack(
-                          alignment: Alignment.center,
+                          clipBehavior: Clip.none,
                           children: [
                             Container(
-                              width: 104,
-                              height: 104,
+                              width: 68,
+                              height: 68,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withValues(alpha: 0.12),
-                              ),
-                            ),
-                            Container(
-                              width: 92,
-                              height: 92,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 3),
-                                color: Colors.white24,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  )
-                                ],
+                                color: Colors.white.withValues(alpha: 0.15),
+                                border: Border.all(color: Colors.white, width: 2),
                               ),
                               child: ClipOval(
                                 child: _isUploading
                                     ? const Padding(
-                                        padding: EdgeInsets.all(22.0),
-                                        child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
+                                        padding: EdgeInsets.all(16.0),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: Colors.white,
+                                        ),
                                       )
                                     : (profile.foto != null && profile.foto!.isNotEmpty)
                                         ? Image.network(
                                             profile.foto!,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 55, color: Colors.white),
+                                            errorBuilder: (context, error, stackTrace) => const Icon(
+                                              Icons.person_rounded,
+                                              size: 38,
+                                              color: Colors.white,
+                                            ),
                                           )
-                                        : const Icon(Icons.person, size: 55, color: Colors.white),
+                                        : const Icon(
+                                            Icons.person_rounded,
+                                            size: 38,
+                                            color: Colors.white,
+                                          ),
                               ),
                             ),
                             Positioned(
-                              bottom: 0,
-                              right: 4,
-                              child: Container(
-                                width: 32,
-                                height: 32,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 6,
-                                      offset: Offset(0, 2),
-                                    )
-                                  ],
-                                ),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: const Icon(Icons.camera_alt_rounded, size: 16, color: primaryColor),
-                                  onPressed: _showImagePickerOptions,
+                              bottom: -2,
+                              right: -2,
+                              child: GestureDetector(
+                                onTap: _showImagePickerOptions,
+                                child: Container(
+                                  width: 25,
+                                  height: 25,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: primaryColor, width: 1.5),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.camera_alt_rounded,
+                                    size: 13,
+                                    color: primaryColor,
+                                  ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          profile.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
+                        const SizedBox(width: 16),
+                        // Name, NIK, Jabatan in light text
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                profile.name,
+                                style: const TextStyle(
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.18),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      'NIK: ${profile.nik}',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (profile.jabatan != null && profile.jabatan!.isNotEmpty) ...[
+                                const SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    Icon(Icons.badge_outlined, size: 13, color: Colors.white.withValues(alpha: 0.8)),
+                                    const SizedBox(width: 5),
+                                    Flexible(
+                                      child: Text(
+                                        profile.jabatan!,
+                                        style: TextStyle(
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white.withValues(alpha: 0.85),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'NIK : ${profile.nik}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.75),
-                          ),
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
 
-                  // ===== BODY CONTAINER =====
+                  const SizedBox(height: 16),
+
+                  // ===== MAIN BODY CONTAINER =====
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // ===== WORK DATA SECTION =====
+                        // ===== SECTION 1: INFORMASI PEKERJAAN =====
                         _buildSectionHeader('Informasi Pekerjaan'),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                                color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           child: Column(
                             children: [
-                              _buildDetailRowItem(Icons.domain_rounded, 'Cabang', profile.cabang ?? '-'),
-                              const Divider(height: 20, color: Color(0xFFF1F5F9)),
-                              _buildDetailRowItem(Icons.corporate_fare_rounded, 'Departemen', profile.departemen ?? '-'),
-                              const Divider(height: 20, color: Color(0xFFF1F5F9)),
-                              _buildDetailRowItem(Icons.badge_rounded, 'Jabatan', profile.jabatan ?? '-'),
+                              _buildDetailRowItem(Icons.apartment_rounded, 'Cabang / Lokasi', profile.cabang ?? '-'),
+                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              _buildDetailRowItem(Icons.work_outline_rounded, 'Departemen', profile.departemen ?? '-'),
+                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              _buildDetailRowItem(Icons.badge_outlined, 'Jabatan', profile.jabatan ?? '-'),
                             ],
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
 
-                        // ===== PERSONAL DATA SECTION =====
-                        _buildSectionHeader('Data Pribadi'),
-                        const SizedBox(height: 12),
+                        // ===== SECTION 2: DATA PRIBADI =====
+                        _buildSectionHeader('Data Pribadi & Kontak'),
+                        const SizedBox(height: 8),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                                color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           child: Column(
                             children: [
-                              _buildDetailRowItem(Icons.email_rounded, 'Email', profile.email),
-                              const Divider(height: 20, color: Color(0xFFF1F5F9)),
-                              _buildDetailRowItem(Icons.phone_android_rounded, 'No. HP', profile.noHp ?? '-'),
-                              const Divider(height: 20, color: Color(0xFFF1F5F9)),
-                              _buildDetailRowItem(Icons.credit_card_rounded, 'No. KTP', profile.noKtp ?? '-'),
-                              const Divider(height: 20, color: Color(0xFFF1F5F9)),
-                              _buildDetailRowItem(Icons.location_on_rounded, 'Alamat', profile.alamat ?? '-'),
+                              _buildDetailRowItem(Icons.mail_outline_rounded, 'Email Kantor', profile.email),
+                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              _buildDetailRowItem(Icons.phone_android_rounded, 'No. Handphone', profile.noHp ?? '-'),
+                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              _buildDetailRowItem(Icons.credit_card_outlined, 'No. Identitas (KTP)', profile.noKtp ?? '-'),
+                              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                              _buildDetailRowItem(Icons.place_outlined, 'Alamat Domisili', profile.alamat ?? '-'),
                             ],
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 18),
 
-                        // ===== SERVICES SECTION =====
-                        _buildSectionHeader('Menu Layanan'),
-                        const SizedBox(height: 12),
+                        // ===== SECTION 3: MENU LAYANAN =====
+                        _buildSectionHeader('Layanan Dokumen'),
+                        const SizedBox(height: 8),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                                color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              borderRadius: BorderRadius.circular(24),
+                              borderRadius: BorderRadius.circular(16),
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -443,16 +486,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 );
                               },
                               child: Padding(
-                                padding: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 child: Row(
                                   children: [
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF1F5F9),
+                                        color: primaryColor.withValues(alpha: 0.08),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: const Icon(Icons.receipt_long_rounded, size: 18, color: Color(0xFF2D5A4C)),
+                                      child: Icon(Icons.receipt_long_rounded, size: 18, color: primaryColor),
                                     ),
                                     const SizedBox(width: 14),
                                     const Expanded(
@@ -460,16 +503,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Slip Gaji',
+                                            'Slip Gaji Bulanan',
                                             style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13.5,
+                                              fontWeight: FontWeight.w600,
                                               color: Color(0xFF1E293B),
                                             ),
                                           ),
                                           SizedBox(height: 2),
                                           Text(
-                                            'Lihat dan unduh slip gaji bulanan Anda',
+                                            'Lihat rincian dan unduh dokumen gaji Anda',
                                             style: TextStyle(
                                               fontSize: 11,
                                               color: Color(0xFF94A3B8),
@@ -478,7 +521,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         ],
                                       ),
                                     ),
-                                    const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                                    const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8), size: 20),
                                   ],
                                 ),
                               ),
@@ -486,57 +529,64 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 18),
 
-                        // ===== CHANGE PASSWORD SECTION =====
+                        // ===== SECTION 4: GANTI PASSWORD =====
                         _buildSectionHeader('Keamanan Akun'),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                                color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(18),
                           child: Form(
                             key: _formKey,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Row(
+                                Row(
                                   children: [
-                                    Icon(Icons.vpn_key_rounded, color: primaryColor, size: 20),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Ganti Password',
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF1F5F9),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(Icons.lock_reset_rounded, color: Color(0xFF475569), size: 16),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    const Text(
+                                      'Ubah Kata Sandi',
                                       style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w700,
                                         color: Color(0xFF1E293B),
-                                        letterSpacing: -0.3,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const Divider(height: 24, color: Color(0xFFF1F5F9)),
+                                const SizedBox(height: 16),
                                 TextFormField(
                                   controller: _oldPasswordController,
                                   obscureText: _obscureOldPassword,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
                                   decoration: _buildInputDecoration(
                                     label: 'Password Lama',
                                     prefixIcon: Icons.lock_open_rounded,
                                     suffixIcon: IconButton(
                                       icon: Icon(
-                                        _obscureOldPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                                        _obscureOldPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                         color: const Color(0xFF94A3B8),
-                                        size: 20,
+                                        size: 18,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -552,19 +602,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 14),
                                 TextFormField(
                                   controller: _passwordController,
                                   obscureText: _obscureNewPassword,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
                                   decoration: _buildInputDecoration(
                                     label: 'Password Baru',
                                     prefixIcon: Icons.lock_outline_rounded,
                                     suffixIcon: IconButton(
                                       icon: Icon(
-                                        _obscureNewPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                                        _obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                         color: const Color(0xFF94A3B8),
-                                        size: 20,
+                                        size: 18,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -583,19 +633,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 14),
                                 TextFormField(
                                   controller: _confirmPasswordController,
                                   obscureText: _obscureConfirmPassword,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
                                   decoration: _buildInputDecoration(
                                     label: 'Konfirmasi Password Baru',
                                     prefixIcon: Icons.check_circle_outline_rounded,
                                     suffixIcon: IconButton(
                                       icon: Icon(
-                                        _obscureConfirmPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                                        _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                         color: const Color(0xFF94A3B8),
-                                        size: 20,
+                                        size: 18,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -614,51 +664,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 24),
-                                
-                                // Premium Gradient Button
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFF2D5A4C), Color(0xFF437A68)],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(14),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: primaryColor.withValues(alpha: 0.35),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 4),
-                                      )
-                                    ],
-                                  ),
+                                const SizedBox(height: 18),
+                                SizedBox(
+                                  height: 46,
                                   child: ElevatedButton(
                                     onPressed: _isUpdatingPassword ? null : _changePassword,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                      padding: const EdgeInsets.symmetric(vertical: 15),
+                                      backgroundColor: primaryColor,
+                                      disabledBackgroundColor: primaryColor.withValues(alpha: 0.6),
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(14),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
                                     child: _isUpdatingPassword
                                         ? const SizedBox(
-                                            height: 20,
-                                            width: 20,
+                                            height: 18,
+                                            width: 18,
                                             child: CircularProgressIndicator(
-                                              strokeWidth: 2.5,
+                                              strokeWidth: 2,
                                               color: Colors.white,
                                             ),
                                           )
                                         : const Text(
-                                            'Perbarui Password',
+                                            'Simpan Password Baru',
                                             style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                              letterSpacing: 0.3,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13.5,
+                                              letterSpacing: 0.2,
                                             ),
                                           ),
                                   ),
@@ -667,6 +701,100 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 18),
+
+                        // ===== SECTION 5: KELUAR AKUN =====
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFFEE2E2), width: 1.15),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    title: const Text(
+                                      'Keluar Akun?',
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                    ),
+                                    content: const Text(
+                                      'Apakah Anda yakin ingin keluar dari aplikasi GAWE?',
+                                      style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('Batal', style: TextStyle(color: Color(0xFF64748B))),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          ref.read(authProvider.notifier).logout();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFFDC2626),
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          elevation: 0,
+                                        ),
+                                        child: const Text('Keluar'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFEF2F2),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFDC2626)),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Keluar dari Aplikasi',
+                                            style: TextStyle(
+                                              fontSize: 13.5,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFFDC2626),
+                                            ),
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            'Keluar dari sesi login perangkat saat ini',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Color(0xFF94A3B8),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(Icons.chevron_right_rounded, color: Color(0xFFFCA5A5), size: 20),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
@@ -720,8 +848,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
+          fontSize: 12.5,
+          fontWeight: FontWeight.w700,
           color: Color(0xFF64748B),
         ),
       ),
@@ -729,43 +857,40 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildDetailRowItem(IconData icon, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, size: 18, color: const Color(0xFF2D5A4C)),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF94A3B8),
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 17, color: const Color(0xFF64748B)),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 125,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF64748B),
               ),
-              const SizedBox(height: 3),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1E293B),
+              ),
+              textAlign: TextAlign.start,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -777,27 +902,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w500),
-      floatingLabelStyle: const TextStyle(color: Color(0xFF2D5A4C), fontWeight: FontWeight.bold),
-      prefixIcon: Icon(prefixIcon, color: const Color(0xFF2D5A4C), size: 20),
+      floatingLabelStyle: const TextStyle(color: Color(0xFF1E6152), fontWeight: FontWeight.w700),
+      prefixIcon: Icon(prefixIcon, color: const Color(0xFF64748B), size: 18),
       suffixIcon: suffixIcon,
+      isDense: true,
       filled: true,
       fillColor: const Color(0xFFF8FAFC),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF2D5A4C), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF1E6152), width: 1.6),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red, width: 1.0),
+        borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.1),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.6),
       ),
     );
   }

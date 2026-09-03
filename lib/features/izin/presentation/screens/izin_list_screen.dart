@@ -12,8 +12,8 @@ class IzinListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const Color primaryColor = Color(0xFF2D5A4C);
-    const Color bodyBgColor = Color(0xFFE8F0ED);
+    const Color primaryColor = Color(0xFF1E6152); // Brand deep green
+    const Color bodyBgColor = Color(0xFFF9FBFA);
     final izinListAsync = ref.watch(izinListProvider);
 
     return Scaffold(
@@ -21,15 +21,23 @@ class IzinListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text(
           'Daftar Ajuan Izin',
-          style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 18, letterSpacing: -0.5),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            fontSize: 17,
+            letterSpacing: 0.1,
+          ),
         ),
         backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
         systemOverlayStyle: SystemUiOverlayStyle.light,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+            icon: const Icon(Icons.refresh_rounded, size: 22, color: Colors.white),
+            tooltip: 'Segarkan',
             onPressed: () => ref.invalidate(izinListProvider),
           ),
         ],
@@ -50,13 +58,23 @@ class IzinListScreen extends ConsumerWidget {
           error: (err, stack) => _buildErrorState(ref, err.toString(), primaryColor),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         heroTag: null,
         onPressed: () => _showJenisIzinSelector(context),
         backgroundColor: primaryColor,
-        elevation: 4,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+        elevation: 3,
+        highlightElevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+        label: const Text(
+          'Buat Ajuan',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 13.5,
+            letterSpacing: 0.2,
+          ),
+        ),
       ),
     );
   }
@@ -70,58 +88,80 @@ class IzinListScreen extends ConsumerWidget {
       backgroundColor: Colors.white,
       builder: (context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Text(
-                    'Pilih Jenis Pengajuan Izin',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-              ),
-              const Divider(height: 1),
-              _buildJenisIzinTile(
-                context,
-                icon: Icons.calendar_today_rounded,
-                color: const Color(0xFF2563EB),
-                title: 'Izin Absen',
-                subtitle: 'Izin tidak masuk kerja karena keperluan tertentu',
-                value: 'i',
-              ),
-              _buildJenisIzinTile(
-                context,
-                icon: Icons.medical_services_rounded,
-                color: const Color(0xFFEF4444),
-                title: 'Izin Sakit',
-                subtitle: 'Izin sakit (wajib melampirkan Surat Dokter)',
-                value: 's',
-              ),
-              _buildJenisIzinTile(
-                context,
-                icon: Icons.beach_access_rounded,
-                color: const Color(0xFF10B981),
-                title: 'Cuti',
-                subtitle: 'Pengajuan cuti tahunan atau cuti khusus',
-                value: 'c',
-              ),
-              _buildJenisIzinTile(
-                context,
-                icon: Icons.business_center_rounded,
-                color: const Color(0xFF8B5CF6),
-                title: 'Dinas',
-                subtitle: 'Tugas luar kota atau keperluan dinas kantor',
-                value: 'd',
-              ),
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 16),
+                const Text(
+                  'Pilih Jenis Pengajuan',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E293B),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Tentukan kategori izin yang ingin Anda ajukan',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: Color(0xFF64748B),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 18),
+                _buildJenisIzinTile(
+                  context,
+                  icon: Icons.calendar_today_rounded,
+                  color: const Color(0xFF0284C7),
+                  title: 'Izin Absen',
+                  subtitle: 'Izin tidak masuk kerja karena keperluan tertentu',
+                  value: 'i',
+                ),
+                const SizedBox(height: 8),
+                _buildJenisIzinTile(
+                  context,
+                  icon: Icons.medical_services_outlined,
+                  color: const Color(0xFFE11D48),
+                  title: 'Izin Sakit',
+                  subtitle: 'Izin sakit (wajib melampirkan Surat Dokter)',
+                  value: 's',
+                ),
+                const SizedBox(height: 8),
+                _buildJenisIzinTile(
+                  context,
+                  icon: Icons.beach_access_outlined,
+                  color: const Color(0xFF10B981),
+                  title: 'Cuti',
+                  subtitle: 'Pengajuan cuti tahunan atau cuti khusus',
+                  value: 'c',
+                ),
+                const SizedBox(height: 8),
+                _buildJenisIzinTile(
+                  context,
+                  icon: Icons.business_center_outlined,
+                  color: const Color(0xFF8B5CF6),
+                  title: 'Dinas',
+                  subtitle: 'Tugas dinas atau keperluan dinas di luar kantor',
+                  value: 'd',
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         );
       },
@@ -136,24 +176,8 @@ class IzinListScreen extends ConsumerWidget {
     required String subtitle,
     required String value,
   }) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: color),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1E293B)),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-      ),
-      trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
       onTap: () {
         Navigator.pop(context);
         Navigator.push(
@@ -163,6 +187,51 @@ class IzinListScreen extends ConsumerWidget {
           ),
         );
       },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.1),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8), size: 20),
+          ],
+        ),
+      ),
     );
   }
 
@@ -177,22 +246,22 @@ class IzinListScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ===== COMPACT SUMMARY BAR =====
+          // ===== ELEGANT SUMMARY METRICS =====
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.03),
                     blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    offset: const Offset(0, 2),
                   )
                 ],
-                border: Border.all(color: const Color(0xFFF1F5F9)),
+                border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
               ),
               child: Row(
                 children: [
@@ -218,7 +287,7 @@ class IzinListScreen extends ConsumerWidget {
                     child: _buildCompactStatItem(
                       title: 'Pending',
                       count: pending.toString(),
-                      icon: Icons.pending_actions_rounded,
+                      icon: Icons.schedule_rounded,
                       iconColor: const Color(0xFFF59E0B),
                     ),
                   ),
@@ -228,10 +297,14 @@ class IzinListScreen extends ConsumerWidget {
           ),
 
           const Padding(
-            padding: EdgeInsets.fromLTRB(22, 16, 22, 8),
+            padding: EdgeInsets.fromLTRB(22, 14, 22, 8),
             child: Text(
               'Riwayat Pengajuan',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF334155),
+              ),
             ),
           ),
 
@@ -254,8 +327,8 @@ class IzinListScreen extends ConsumerWidget {
 
   Widget _buildVerticalDivider() {
     return Container(
-      height: 24,
-      width: 1,
+      height: 28,
+      width: 1.1,
       color: const Color(0xFFE2E8F0),
     );
   }
@@ -270,10 +343,10 @@ class IzinListScreen extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.08),
-            shape: BoxShape.circle,
+            color: iconColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: iconColor, size: 16),
         ),
@@ -286,15 +359,15 @@ class IzinListScreen extends ConsumerWidget {
               Text(
                 count,
                 style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w700,
                   color: Color(0xFF1E293B),
                 ),
               ),
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 10,
+                  fontSize: 10.5,
                   color: Color(0xFF64748B),
                   fontWeight: FontWeight.w500,
                 ),
@@ -317,47 +390,47 @@ class IzinListScreen extends ConsumerWidget {
     switch (item.ket) {
       case 'i':
         typeLabel = 'Izin Absen';
-        typeColor = const Color(0xFF2563EB); // Blue
+        typeColor = const Color(0xFF0284C7); // Blue
         typeIcon = Icons.calendar_today_rounded;
         break;
       case 's':
         typeLabel = 'Izin Sakit';
-        typeColor = const Color(0xFFEF4444); // Red
-        typeIcon = Icons.medical_services_rounded;
+        typeColor = const Color(0xFFE11D48); // Red
+        typeIcon = Icons.medical_services_outlined;
         break;
       case 'c':
         typeLabel = 'Cuti';
         typeColor = const Color(0xFF10B981); // Green
-        typeIcon = Icons.beach_access_rounded;
+        typeIcon = Icons.beach_access_outlined;
         break;
       case 'd':
         typeLabel = 'Dinas';
         typeColor = const Color(0xFF8B5CF6); // Purple
-        typeIcon = Icons.business_center_rounded;
+        typeIcon = Icons.business_center_outlined;
         break;
       case 'k':
         typeLabel = 'Koreksi Absen';
-        typeColor = const Color(0xFFF59E0B); // Amber
+        typeColor = const Color(0xFFD97706); // Amber
         typeIcon = Icons.edit_calendar_rounded;
         break;
     }
 
     // Setup status labels
     String statusText = 'Pending';
-    Color statusBg = const Color(0xFFFFF3CD);
-    Color statusFg = const Color(0xFF856404);
-    IconData statusIcon = Icons.hourglass_empty_rounded;
+    Color statusBg = const Color(0xFFFFFBEB);
+    Color statusFg = const Color(0xFFD97706);
+    IconData statusIcon = Icons.schedule_rounded;
 
     if (item.status == 1) {
       statusText = 'Disetujui';
-      statusBg = const Color(0xFFD1E7DD);
-      statusFg = const Color(0xFF0F5132);
-      statusIcon = Icons.check_circle_rounded;
+      statusBg = const Color(0xFFF0FDF4);
+      statusFg = const Color(0xFF16A34A);
+      statusIcon = Icons.check_circle_outline_rounded;
     } else if (item.status == 2) {
       statusText = 'Ditolak';
-      statusBg = const Color(0xFFF8D7DA);
-      statusFg = const Color(0xFF842029);
-      statusIcon = Icons.cancel_rounded;
+      statusBg = const Color(0xFFFEF2F2);
+      statusFg = const Color(0xFFDC2626);
+      statusIcon = Icons.highlight_off_rounded;
     }
 
     // Parse date ranges
@@ -367,26 +440,26 @@ class IzinListScreen extends ConsumerWidget {
     int totalDays = 1;
 
     if (fromDate != null && toDate != null) {
-      dateRangeStr = '${DateFormat('d MMM y').format(fromDate)} - ${DateFormat('d MMM y').format(toDate)}';
+      dateRangeStr = '${DateFormat('d MMM y', 'id_ID').format(fromDate)} - ${DateFormat('d MMM y', 'id_ID').format(toDate)}';
       totalDays = toDate.difference(fromDate).inDays + 1;
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E293B).withOpacity(0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.025),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           )
         ],
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -396,20 +469,20 @@ class IzinListScreen extends ConsumerWidget {
               children: [
                 // Type Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: typeColor.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
+                    color: typeColor.withValues(alpha: 0.09),
+                    borderRadius: BorderRadius.circular(7),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(typeIcon, color: typeColor, size: 14),
-                      const SizedBox(width: 6),
+                      Icon(typeIcon, color: typeColor, size: 13),
+                      const SizedBox(width: 5),
                       Text(
                         typeLabel,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 11,
                           color: typeColor,
                         ),
@@ -419,10 +492,10 @@ class IzinListScreen extends ConsumerWidget {
                 ),
                 // Status Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                   decoration: BoxDecoration(
                     color: statusBg,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
                     children: [
@@ -430,42 +503,61 @@ class IzinListScreen extends ConsumerWidget {
                       const SizedBox(width: 4),
                       Text(
                         statusText,
-                        style: TextStyle(color: statusFg, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: statusFg,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             // Date & Days count Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.calendar_month_outlined, size: 16, color: Color(0xFF64748B)),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.date_range_outlined, size: 15, color: Color(0xFF64748B)),
+                    const SizedBox(width: 6),
                     Text(
                       dateRangeStr,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF334155),
+                      ),
                     ),
                   ],
                 ),
-                Text(
-                  '$totalDays Hari',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    '$totalDays Hari',
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF475569),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             // Reason / Alasan
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(9),
                 border: Border.all(color: const Color(0xFFF1F5F9)),
               ),
               child: Column(
@@ -473,19 +565,28 @@ class IzinListScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     'KETERANGAN / ALASAN',
-                    style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: Color(0xFF94A3B8),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.4,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Text(
-                    item.keterangan,
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF475569), height: 1.4),
+                    item.keterangan.isNotEmpty ? item.keterangan : '-',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF475569),
+                      height: 1.35,
+                    ),
                   ),
                 ],
               ),
             ),
             // Action buttons row (Attachment / Cancel)
             if (item.docSidUrl != null || (item.status == 0 && item.ket != 'k')) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   if (item.docSidUrl != null) ...[
@@ -495,20 +596,24 @@ class IzinListScreen extends ConsumerWidget {
                       },
                       borderRadius: BorderRadius.circular(8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.05),
+                          color: primaryColor.withValues(alpha: 0.07),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: primaryColor.withOpacity(0.15)),
+                          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.attach_file_rounded, size: 14, color: primaryColor),
-                            const SizedBox(width: 6),
+                            Icon(Icons.attach_file_rounded, size: 13, color: primaryColor),
+                            const SizedBox(width: 4),
                             Text(
                               'Lihat Lampiran (SID)',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: primaryColor,
+                              ),
                             ),
                           ],
                         ),
@@ -523,20 +628,24 @@ class IzinListScreen extends ConsumerWidget {
                       },
                       borderRadius: BorderRadius.circular(8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.05),
+                          color: const Color(0xFFFEF2F2),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red.withOpacity(0.15)),
+                          border: Border.all(color: const Color(0xFFFECACA)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.delete_outline_rounded, size: 14, color: Colors.red),
-                            SizedBox(width: 6),
+                            Icon(Icons.close_rounded, size: 13, color: Color(0xFFDC2626)),
+                            SizedBox(width: 4),
                             Text(
                               'Batalkan',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red),
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFFDC2626),
+                              ),
                             ),
                           ],
                         ),
@@ -682,28 +791,36 @@ class IzinListScreen extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context, Color primaryColor) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40.0),
+        padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 60.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.08),
-                shape: BoxShape.circle,
+                color: primaryColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(Icons.calendar_today_rounded, size: 50, color: primaryColor),
+              child: Icon(Icons.event_note_rounded, size: 44, color: primaryColor),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             const Text(
               'Belum Ada Ajuan Izin',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E293B),
+              ),
             ),
             const SizedBox(height: 6),
             const Text(
-              'Riwayat pengajuan izin, sakit, cuti atau dinas Anda akan tampil di sini.',
+              'Riwayat pengajuan izin, sakit, cuti atau dinas Anda akan otomatis tampil di sini.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              style: TextStyle(
+                fontSize: 12.5,
+                color: Color(0xFF64748B),
+                height: 1.4,
+              ),
             ),
           ],
         ),
@@ -718,19 +835,35 @@ class IzinListScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF2F2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.error_outline_rounded, size: 36, color: Color(0xFFDC2626)),
+            ),
             const SizedBox(height: 16),
             Text(
-              'Gagal memuat data: $error',
+              'Gagal memuat data: ${error.replaceAll('Exception: ', '')}',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: Color(0xFFDC2626),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () => ref.invalidate(izinListProvider),
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Coba Lagi'),
-              style: ElevatedButton.styleFrom(backgroundColor: primaryColor, foregroundColor: Colors.white),
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Coba Lagi', style: TextStyle(fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
             )
           ],
         ),

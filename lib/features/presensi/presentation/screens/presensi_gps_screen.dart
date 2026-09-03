@@ -626,45 +626,59 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                               ] else
                                 const Center(child: CircularProgressIndicator(color: Colors.white)),
 
-                              // Top-Left Date Stamp
+                              // Top-Left Date Stamp (Modern soft pill)
                               Positioned(
-                                top: 14,
-                                left: 14,
+                                top: 12,
+                                left: 12,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.5),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    DateFormat('dd MMM yyyy').format(_currentTime),
-                                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-
-                              // Top-Right Digital Clock
-                              Positioned(
-                                top: 14,
-                                right: 14,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.5),
-                                    borderRadius: BorderRadius.circular(8),
+                                    color: const Color(0xFF0F172A).withValues(alpha: 0.65),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.access_time_filled_rounded, color: Colors.white, size: 14),
+                                      const Icon(Icons.calendar_today_rounded, color: Colors.white70, size: 11),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        DateFormat('dd MMM yyyy', 'id_ID').format(_currentTime),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Top-Right Digital Clock (Modern soft pill)
+                              Positioned(
+                                top: 12,
+                                right: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0F172A).withValues(alpha: 0.65),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.schedule_rounded, color: Colors.white70, size: 12),
                                       const SizedBox(width: 4),
                                       Text(
                                         DateFormat('HH:mm:ss').format(_currentTime),
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'monospace',
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.3,
                                         ),
                                       ),
                                     ],
@@ -686,14 +700,14 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                           decoration: BoxDecoration(
                                             border: Border.all(
                                               color: _getBorderColorByStatus(),
-                                              width: 3.5,
+                                              width: 2.5,
                                             ),
                                             borderRadius: const BorderRadius.all(Radius.elliptical(220, 280)),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: _getBorderColorByStatus().withOpacity(0.2),
-                                                blurRadius: 15,
-                                                spreadRadius: 2,
+                                                color: _getBorderColorByStatus().withValues(alpha: 0.25),
+                                                blurRadius: 16,
+                                                spreadRadius: 1,
                                               )
                                             ],
                                           ),
@@ -705,17 +719,18 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                             builder: (context, child) {
                                               return Positioned(
                                                 top: _scannerController!.value * 270,
-                                                left: 20,
-                                                right: 20,
+                                                left: 24,
+                                                right: 24,
                                                 child: Container(
-                                                  height: 3,
+                                                  height: 2.5,
                                                   decoration: BoxDecoration(
-                                                    color: Colors.cyanAccent,
+                                                    color: const Color(0xFF38BDF8),
+                                                    borderRadius: BorderRadius.circular(2),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                        color: Colors.cyanAccent.withOpacity(0.8),
-                                                        blurRadius: 8,
-                                                        spreadRadius: 2,
+                                                        color: const Color(0xFF38BDF8).withValues(alpha: 0.8),
+                                                        blurRadius: 10,
+                                                        spreadRadius: 1,
                                                       )
                                                     ],
                                                   ),
@@ -739,7 +754,7 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                       decoration: BoxDecoration(
                                         color: _getStatusBgColor(),
                                         borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: _getBorderColorByStatus().withOpacity(0.5), width: 1.5),
+                                        border: Border.all(color: _getBorderColorByStatus().withValues(alpha: 0.4), width: 1.15),
                                         boxShadow: const [
                                           BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
                                         ],
@@ -757,7 +772,7 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 11,
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),
@@ -773,11 +788,11 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.75),
+                                        color: const Color(0xFF0F172A).withValues(alpha: 0.8),
                                         borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                          color: _isFaceDetected ? Colors.greenAccent.withOpacity(0.4) : Colors.redAccent.withOpacity(0.4),
-                                          width: 1.5,
+                                          color: _isFaceDetected ? const Color(0xFF10B981).withValues(alpha: 0.5) : const Color(0xFFEF4444).withValues(alpha: 0.4),
+                                          width: 1.15,
                                         ),
                                         boxShadow: const [
                                           BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
@@ -787,9 +802,9 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
-                                            _isFaceDetected ? Icons.face_rounded : Icons.face_retouching_off_rounded,
-                                            color: _isFaceDetected ? Colors.greenAccent : Colors.redAccent,
-                                            size: 18,
+                                            _isFaceDetected ? Icons.check_circle_rounded : Icons.face_retouching_natural_rounded,
+                                            color: _isFaceDetected ? const Color(0xFF10B981) : const Color(0xFFF87171),
+                                            size: 16,
                                           ),
                                           const SizedBox(width: 8),
                                           Expanded(
@@ -802,7 +817,7 @@ class _PresensiGpsScreenState extends ConsumerState<PresensiGpsScreen> with Sing
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 10.5,
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ),

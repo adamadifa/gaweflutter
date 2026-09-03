@@ -169,19 +169,25 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
     final primaryColor = AppThemeScheme.getPrimary(generalSetting?.mobileThemeScheme);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF9FBFA),
       appBar: AppBar(
         title: const Text(
           'E-ID Card',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 0.1,
+          ),
         ),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share_rounded, size: 20, color: Colors.white),
+            icon: const Icon(Icons.print_rounded, size: 20, color: Colors.white),
             tooltip: 'Simpan / Cetak',
             onPressed: _exportIdCard,
           ),
@@ -192,23 +198,23 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: Column(
                 children: [
-                  const SizedBox(height: 12),
-                  // Premium Segmented Controller / Switch
+                  // Modern Capsule Segment Switch
                   Center(
                     child: Container(
-                      width: 220,
+                      width: 210,
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           )
                         ],
                       ),
@@ -220,17 +226,18 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                                 if (!_isFront) _toggleCard();
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
                                 decoration: BoxDecoration(
                                   color: _isFront ? primaryColor : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   'DEPAN',
                                   style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
                                     color: _isFront ? Colors.white : const Color(0xFF64748B),
                                   ),
                                 ),
@@ -243,17 +250,18 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                                 if (_isFront) _toggleCard();
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.symmetric(vertical: 8),
                                 decoration: BoxDecoration(
                                   color: !_isFront ? primaryColor : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   'BELAKANG',
                                   style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
                                     color: !_isFront ? Colors.white : const Color(0xFF64748B),
                                   ),
                                 ),
@@ -264,7 +272,7 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
                   // 3D Flip Card Container
                   Center(
@@ -420,20 +428,20 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
         height: 520,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF1E293B).withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            // Light background stripes (simulating the background pattern)
+            // Light background stripes
             Positioned.fill(
               child: CustomPaint(
                 painter: BackgroundPatternPainter(),
@@ -474,19 +482,19 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                                   if (companyLogoUrl != null && companyLogoUrl.isNotEmpty) ...[
                                     Image.network(
                                       companyLogoUrl,
-                                      height: 55, // Larger logo height (from 35 to 55)
+                                      height: 52,
                                       fit: BoxFit.contain,
                                       errorBuilder: (context, error, stackTrace) => const Icon(
                                         Icons.shield_outlined,
                                         color: Colors.white,
-                                        size: 55,
+                                        size: 50,
                                       ),
                                     ),
                                   ] else ...[
                                     const Icon(
                                       Icons.shield_outlined,
                                       color: Colors.white,
-                                      size: 55,
+                                      size: 50,
                                     ),
                                   ],
                                   const SizedBox(height: 8),
@@ -494,9 +502,9 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                                     companyName.toUpperCase(),
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1.5,
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1.2,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -505,10 +513,10 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                                     Text(
                                       companyAddress.toUpperCase(),
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.7),
+                                        color: Colors.white.withValues(alpha: 0.75),
                                         fontSize: 7.5,
                                         fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.5,
+                                        letterSpacing: 0.4,
                                       ),
                                       textAlign: TextAlign.center,
                                       maxLines: 2,
@@ -534,7 +542,7 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w900,
+                                fontWeight: FontWeight.w700,
                                 color: brandGreenStart,
                                 letterSpacing: 0.2,
                               ),
@@ -546,29 +554,37 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                               '${jobTitle.toUpperCase()} - ${department.toUpperCase()}',
                               style: const TextStyle(
                                 fontSize: 10.5,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: textMuted,
-                                letterSpacing: 0.5,
+                                letterSpacing: 0.4,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'STAFF KARYAWAN',
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w900,
-                                color: goldAccent,
-                                letterSpacing: 1.0,
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'STAFF KARYAWAN',
+                                style: TextStyle(
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: goldAccent,
+                                  letterSpacing: 0.8,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
                             Text(
-                              'GPS VERIFIED - $nik',
+                              'GPS VERIFIED • $nik',
                               style: TextStyle(
                                 fontSize: 9.5,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: brandGreenStart,
+                                letterSpacing: 0.3,
                               ),
                             ),
                           ],
@@ -587,7 +603,7 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                               'ID',
                               style: TextStyle(
                                 fontSize: 11,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w700,
                                 color: textMuted,
                               ),
                             ),
@@ -598,7 +614,7 @@ class _IdCardScreenState extends ConsumerState<IdCardScreen> with SingleTickerPr
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   CustomPaint(
-                                    size: const Size(double.infinity, 28),
+                                    size: const Size(double.infinity, 26),
                                     painter: BarcodePainter(nik),
                                   ),
                                   const SizedBox(height: 3),

@@ -14,8 +14,8 @@ class RiwayatPresensiScreen extends ConsumerStatefulWidget {
 class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF2D5A4C);
-    const Color bodyBgColor = Color(0xFFE8F0ED);
+    const Color primaryColor = Color(0xFF1E6152);
+    const Color bodyBgColor = Color(0xFFF9FBFA);
 
     final selectedDate = ref.watch(riwayatBulanTahunProvider);
     final riwayatAsync = ref.watch(riwayatProvider);
@@ -25,48 +25,79 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
       appBar: AppBar(
         title: const Text(
           'Histori Kehadiran',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 0.1,
+          ),
         ),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
-          // Month selector header
+          // Month selector bar
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left_rounded, color: primaryColor),
-                  onPressed: () {
+                InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
                     final prevMonth = DateTime(selectedDate.year, selectedDate.month - 1);
                     ref.read(riwayatBulanTahunProvider.notifier).setDate(prevMonth);
                   },
-                ),
-                Text(
-                  _getMonthYearLabelIndo(selectedDate),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.chevron_left_rounded, color: Color(0xFF334155), size: 20),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right_rounded, color: primaryColor),
-                  onPressed: () {
+                Row(
+                  children: [
+                    Icon(Icons.calendar_month_rounded, size: 16, color: primaryColor),
+                    const SizedBox(width: 8),
+                    Text(
+                      _getMonthYearLabelIndo(selectedDate),
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                  ],
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
                     final nextMonth = DateTime(selectedDate.year, selectedDate.month + 1);
                     ref.read(riwayatBulanTahunProvider.notifier).setDate(nextMonth);
                   },
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.chevron_right_rounded, color: Color(0xFF334155), size: 20),
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 1),
+          Container(
+            height: 1,
+            color: const Color(0xFFE2E8F0),
+          ),
 
           // Main content
           Expanded(
@@ -81,32 +112,45 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
 
                       // History list section
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                        padding: const EdgeInsets.fromLTRB(18, 16, 18, 32),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Rincian Kehadiran',
+                              'Rincian Kehadiran Harian',
                               style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
                                 color: Color(0xFF475569),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 10),
                             if (riwayatList.isEmpty)
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.all(24),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
                                 ),
-                                child: const Center(
-                                  child: Text(
-                                    'Tidak ada data kehadiran pada bulan ini',
-                                    style: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                                  ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: primaryColor.withValues(alpha: 0.08),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(Icons.event_busy_rounded, size: 28, color: primaryColor),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const Text(
+                                      'Tidak ada riwayat kehadiran pada bulan ini',
+                                      style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
                               )
                             else
@@ -127,9 +171,9 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
                   ),
                 );
               },
-              loading: () => const Center(
+              loading: () => Center(
                 child: Padding(
-                  padding: EdgeInsets.all(40.0),
+                  padding: const EdgeInsets.all(40.0),
                   child: CircularProgressIndicator(color: primaryColor),
                 ),
               ),
@@ -139,18 +183,24 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 44),
                       const SizedBox(height: 12),
                       Text(
                         'Gagal memuat data: ${error.toString().replaceAll('Exception: ', '')}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13, fontWeight: FontWeight.w500),
                       ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
+                      const SizedBox(height: 14),
+                      ElevatedButton.icon(
                         onPressed: () => ref.invalidate(riwayatProvider),
-                        style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                        child: const Text('Coba Lagi', style: TextStyle(color: Colors.white)),
+                        icon: const Icon(Icons.refresh_rounded, size: 16),
+                        label: const Text('Coba Lagi'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
                       )
                     ],
                   ),
@@ -175,7 +225,6 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
     final daysInMonth = DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
     final firstDayOffset = DateTime(selectedDate.year, selectedDate.month, 1).weekday - 1; // 0 for Monday
 
-    // Map of day to status
     final Map<int, RiwayatModel> riwayatMap = {};
     for (var r in riwayatList) {
       final dt = DateTime.tryParse(r.tanggal);
@@ -184,83 +233,86 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
       }
     }
 
-    // Days label (Mo, Tu, We, Th, Fr, Sa, Su)
     final dayLabels = ['Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb', 'Mg'];
 
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       child: Column(
         children: [
-          // Day labels row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: dayLabels.map((lbl) {
               return SizedBox(
-                width: 40,
+                width: 36,
                 child: Text(
                   lbl,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF94A3B8),
                   ),
                 ),
               );
             }).toList(),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
-          // Calendar cells Grid
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: 42, // 6 weeks max
+            itemCount: 42,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
               childAspectRatio: 1.0,
             ),
             itemBuilder: (context, index) {
               final dayNumber = index - firstDayOffset + 1;
               if (dayNumber <= 0 || dayNumber > daysInMonth) {
-                return const SizedBox.shrink(); // Empty cell
+                return const SizedBox.shrink();
               }
 
               final riwayat = riwayatMap[dayNumber];
-              Color cellColor = const Color(0xFFF1F5F9);
-              Color textColor = const Color(0xFF1E293B);
+              Color cellColor = const Color(0xFFF8FAFC);
+              Color textColor = const Color(0xFF334155);
+              Border? border = Border.all(color: const Color(0xFFF1F5F9), width: 1);
 
               if (riwayat != null) {
                 final status = riwayat.status.toLowerCase();
                 if (status == 'h') {
-                  cellColor = primaryColor.withValues(alpha: 0.15);
-                  textColor = primaryColor;
+                  cellColor = const Color(0xFFF0FDF4);
+                  textColor = const Color(0xFF16A34A);
+                  border = Border.all(color: const Color(0xFFBBF7D0), width: 1);
                 } else if (status == 's') {
-                  cellColor = const Color(0xFFFF9800).withValues(alpha: 0.15);
-                  textColor = const Color(0xFFE65100);
+                  cellColor = const Color(0xFFFEF2F2);
+                  textColor = const Color(0xFFE11D48);
+                  border = Border.all(color: const Color(0xFFFECDD3), width: 1);
                 } else if (status == 'i') {
-                  cellColor = const Color(0xFF2196F3).withValues(alpha: 0.15);
-                  textColor = const Color(0xFF0D47A1);
+                  cellColor = const Color(0xFFF0F9FF);
+                  textColor = const Color(0xFF0284C7);
+                  border = Border.all(color: const Color(0xFFBAE6FD), width: 1);
                 } else if (status == 'c') {
-                  cellColor = const Color(0xFFFF5252).withValues(alpha: 0.15);
-                  textColor = const Color(0xFFB71C1C);
+                  cellColor = const Color(0xFFECFDF5);
+                  textColor = const Color(0xFF059669);
+                  border = Border.all(color: const Color(0xFFA7F3D0), width: 1);
                 }
               }
 
               return Container(
                 decoration: BoxDecoration(
                   color: cellColor,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
+                  border: border,
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   dayNumber.toString(),
                   style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
                 ),
@@ -273,27 +325,29 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
   }
 
   Widget _buildRiwayatCard(RiwayatModel item, Color primaryColor) {
-    // Parse status details
     String statusText = 'Hadir';
-    Color statusColor = primaryColor;
-    Color statusBg = primaryColor.withValues(alpha: 0.1);
+    Color statusColor = const Color(0xFF16A34A);
+    Color statusBg = const Color(0xFFF0FDF4);
+    IconData statusIcon = Icons.check_circle_outline_rounded;
 
     final status = item.status.toLowerCase();
     if (status == 's') {
       statusText = 'Sakit';
-      statusColor = const Color(0xFFFF9800);
-      statusBg = const Color(0xFFFF9800).withValues(alpha: 0.1);
+      statusColor = const Color(0xFFE11D48);
+      statusBg = const Color(0xFFFEF2F2);
+      statusIcon = Icons.medical_services_outlined;
     } else if (status == 'i') {
       statusText = 'Izin';
-      statusColor = const Color(0xFF2196F3);
-      statusBg = const Color(0xFF2196F3).withValues(alpha: 0.1);
+      statusColor = const Color(0xFF0284C7);
+      statusBg = const Color(0xFFF0F9FF);
+      statusIcon = Icons.calendar_today_rounded;
     } else if (status == 'c') {
       statusText = 'Cuti';
-      statusColor = const Color(0xFFFF5252);
-      statusBg = const Color(0xFFFF5252).withValues(alpha: 0.1);
+      statusColor = const Color(0xFF059669);
+      statusBg = const Color(0xFFECFDF5);
+      statusIcon = Icons.beach_access_outlined;
     }
 
-    // Parse date
     DateTime? dt = DateTime.tryParse(item.tanggal);
     String dateLabel = item.tanggal;
     if (dt != null) {
@@ -303,9 +357,17 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.025),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -315,24 +377,31 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
               Text(
                 dateLabel,
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12.5,
                   color: Color(0xFF1E293B),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                 decoration: BoxDecoration(
                   color: statusBg,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
-                  statusText,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: statusColor,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(statusIcon, size: 11.5, color: statusColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      statusText,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -342,96 +411,121 @@ class _RiwayatPresensiScreenState extends ConsumerState<RiwayatPresensiScreen> {
             Row(
               children: [
                 Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey[200]!),
-                          image: (item.fotoIn != null)
-                              ? DecorationImage(
-                                  image: NetworkImage(item.fotoIn!),
-                                  fit: BoxFit.cover,
-                                )
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(color: const Color(0xFFF1F5F9)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            image: (item.fotoIn != null)
+                                ? DecorationImage(
+                                    image: NetworkImage(item.fotoIn!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child: item.fotoIn == null
+                              ? const Icon(Icons.login_rounded, color: Color(0xFF10B981), size: 15)
                               : null,
                         ),
-                        child: item.fotoIn == null
-                            ? Icon(Icons.camera_alt_outlined, color: primaryColor, size: 16)
-                            : null,
-                      ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Masuk',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                          ),
-                          Text(
-                            item.jamIn ?? '--:--',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Masuk',
+                              style: TextStyle(fontSize: 10, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            Text(
+                              item.jamIn ?? '--:--',
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey[200]!),
-                          image: (item.fotoOut != null)
-                              ? DecorationImage(
-                                  image: NetworkImage(item.fotoOut!),
-                                  fit: BoxFit.cover,
-                                )
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(color: const Color(0xFFF1F5F9)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            image: (item.fotoOut != null)
+                                ? DecorationImage(
+                                    image: NetworkImage(item.fotoOut!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child: item.fotoOut == null
+                              ? const Icon(Icons.logout_rounded, color: Color(0xFFF59E0B), size: 15)
                               : null,
                         ),
-                        child: item.fotoOut == null
-                            ? Icon(Icons.camera_alt_outlined, color: primaryColor, size: 16)
-                            : null,
-                      ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Pulang',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                          ),
-                          Text(
-                            item.jamOut ?? '--:--',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Pulang',
+                              style: TextStyle(fontSize: 10, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            Text(
+                              item.jamOut ?? '--:--',
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             )
           else if (item.keterangan != null && item.keterangan!.isNotEmpty)
-            Text(
-              'Keterangan: ${item.keterangan}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF64748B),
-                fontStyle: FontStyle.italic,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(color: const Color(0xFFF1F5F9)),
+              ),
+              child: Text(
+                'Keterangan: ${item.keterangan}',
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  color: Color(0xFF475569),
+                ),
               ),
             ),
         ],

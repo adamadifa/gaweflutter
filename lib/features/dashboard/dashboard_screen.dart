@@ -1433,223 +1433,324 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildPresensiTabContent(List<RiwayatModel> history, Color primaryColor) {
     if (history.isEmpty) {
-      return Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[100]!),
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFF1F5F9)),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+        child: Column(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(
+                Icons.calendar_today_rounded,
+                size: 24,
+                color: Color(0xFF94A3B8),
+              ),
             ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Icon(Icons.calendar_today_rounded, size: 48, color: Colors.grey[300]),
-                const SizedBox(height: 12),
-                const Text(
-                  'Belum Ada Histori Presensi',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF475569),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Data kehadiran Anda dalam 30 hari terakhir akan muncul di sini.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF94A3B8),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 12),
+            const Text(
+              'Belum Ada Histori Presensi',
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            const Text(
+              'Data kehadiran Anda dalam 30 hari terakhir akan otomatis tampil di sini.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF94A3B8),
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: history.length,
       padding: EdgeInsets.zero,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final item = history[index];
-        
-        DateTime parsedDate = DateTime.tryParse(item.tanggal) ?? DateTime.now();
-        String dayShort = DateFormat('EEE').format(parsedDate).toUpperCase();
-        String dateDay = DateFormat('dd').format(parsedDate);
-        String dateFull = DateFormat('dd MMMM yyyy').format(parsedDate);
 
+        final DateTime parsedDate = DateTime.tryParse(item.tanggal) ?? DateTime.now();
+        final String dayShort = DateFormat('EEE', 'id_ID').format(parsedDate).toUpperCase();
+        final String dateDay = DateFormat('dd').format(parsedDate);
+        final String dateFull = DateFormat('EEEE, dd MMM yyyy', 'id_ID').format(parsedDate);
+
+        // Status styling tokens (Softer tones)
         Color statusColor = primaryColor;
-        Color bgColor = primaryColor.withOpacity(0.08);
-        String statusLabel = item.keterangan ?? 'Hadir';
+        Color statusBg = primaryColor.withValues(alpha: 0.08);
+        String statusLabel = 'Hadir';
+        IconData statusIcon = Icons.check_circle_outline_rounded;
 
-        if (item.status == 'i') {
-          statusColor = const Color(0xFF2196F3);
-          bgColor = const Color(0xFF2196F3).withOpacity(0.08);
-        } else if (item.status == 's') {
-          statusColor = const Color(0xFFFF5252);
-          bgColor = const Color(0xFFFF5252).withOpacity(0.08);
-        } else if (item.status == 'c') {
-          statusColor = const Color(0xFFFF9800);
-          bgColor = const Color(0xFFFF9800).withOpacity(0.08);
-        } else if (item.status == 'a') {
-          statusColor = Colors.red;
-          bgColor = Colors.red.withOpacity(0.08);
+        final status = item.status.toLowerCase();
+        if (status == 'i') {
+          statusColor = const Color(0xFF0284C7); // Sky 600
+          statusBg = const Color(0xFFF0F9FF);
+          statusLabel = item.keterangan?.isNotEmpty == true ? item.keterangan! : 'Izin';
+          statusIcon = Icons.info_outline_rounded;
+        } else if (status == 's') {
+          statusColor = const Color(0xFFE11D48); // Rose 600
+          statusBg = const Color(0xFFFFF1F2);
+          statusLabel = item.keterangan?.isNotEmpty == true ? item.keterangan! : 'Sakit';
+          statusIcon = Icons.medical_services_outlined;
+        } else if (status == 'c') {
+          statusColor = const Color(0xFFD97706); // Amber 600
+          statusBg = const Color(0xFFFFFBEB);
+          statusLabel = item.keterangan?.isNotEmpty == true ? item.keterangan! : 'Cuti';
+          statusIcon = Icons.beach_access_outlined;
+        } else if (status == 'a') {
+          statusColor = const Color(0xFFDC2626); // Red 600
+          statusBg = const Color(0xFFFEF2F2);
+          statusLabel = 'Alpa';
+          statusIcon = Icons.highlight_off_rounded;
+        }
+
+        // Determine if late
+        bool isLate = false;
+        int lateMinutes = 0;
+        if (status == 'h' && item.jamIn != null && item.jamMasuk.isNotEmpty) {
+          try {
+            final inTime = DateFormat('HH:mm').parse(item.jamIn!);
+            final limitTime = DateFormat('HH:mm').parse(item.jamMasuk);
+            if (inTime.isAfter(limitTime)) {
+              isLate = true;
+              lateMinutes = inTime.difference(limitTime).inMinutes;
+            }
+          } catch (_) {}
         }
 
         return Container(
-          margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: statusColor.withOpacity(0.2)),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isLate ? const Color(0xFFFCA5A5) : const Color(0xFFE2E8F0),
+              width: 1.15,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.01),
-                blurRadius: 4,
+                color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+                blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
           child: Row(
             children: [
+              // Date Badge Column (Clear structured border)
               Container(
-                width: 45,
-                height: 45,
+                width: 44,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: bgColor,
+                  color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: const Color(0xFFE2E8F0),
+                    width: 1.1,
+                  ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       dayShort,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
-                        fontWeight: FontWeight.w800,
-                        color: statusColor,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF94A3B8),
+                        letterSpacing: 0.3,
                       ),
                     ),
+                    const SizedBox(height: 1),
                     Text(
                       dateDay,
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                         color: statusColor,
-                        height: 1.1,
+                        height: 1.05,
                       ),
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(width: 12),
+
+              // Attendance details column
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Date & Shift tag row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          dateFull,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF334155),
+                        Expanded(
+                          child: Text(
+                            dateFull,
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF334155),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8F9FA),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFEEEEEE)),
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
                           ),
                           child: Text(
-                            item.namaJamKerja.isNotEmpty ? item.namaJamKerja : 'NON SHIFT',
+                            item.namaJamKerja.isNotEmpty ? item.namaJamKerja : 'Reguler',
                             style: const TextStyle(
                               fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF666666),
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF64748B),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    if (item.status == 'h') ...[
+
+                    const SizedBox(height: 6),
+
+                    // Time or Status Badges
+                    if (status == 'h')
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '${item.jamIn ?? "--:--"}  -  ${item.jamOut ?? "--:--"}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF555555),
+                          // Jam Masuk
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.login_rounded,
+                                size: 12,
+                                color: Color(0xFF10B981),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                item.jamIn ?? '--:--',
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(width: 12),
+
+                          // Jam Pulang
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.logout_rounded,
+                                size: 12,
+                                color: Color(0xFFF59E0B),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                item.jamOut ?? '--:--',
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const Spacer(),
+
+                          // Punctuality Badge (Softer tint & weight)
+                          if (isLate)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEF2F2),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Telat ${lateMinutes}m',
+                                style: const TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFE11D48),
+                                ),
+                              ),
+                            )
+                          else if (item.jamIn != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0FDF4),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text(
+                                'Tepat Waktu',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF16A34A),
+                                ),
+                              ),
                             ),
-                          ),
-                          Builder(
-                            builder: (context) {
-                              if (item.jamIn == null) {
-                                return const SizedBox.shrink();
-                              }
-                              try {
-                                final inTime = DateFormat('HH:mm').parse(item.jamIn!);
-                                final limitTime = DateFormat('HH:mm').parse(item.jamMasuk);
-                                if (inTime.isAfter(limitTime)) {
-                                  final diff = inTime.difference(limitTime).inMinutes;
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.withOpacity(0.08),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      'Telat ${diff}m',
-                                      style: const TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              } catch (_) {}
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: primaryColor.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  'Tepat Waktu',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
                         ],
-                      ),
-                    ] else ...[
-                      Text(
-                        statusLabel,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: statusColor,
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: statusBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              statusIcon,
+                              size: 12,
+                              color: statusColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              statusLabel,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: statusColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
                   ],
                 ),
               ),
@@ -1666,53 +1767,57 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return lemburListAsync.when(
       data: (lemburList) {
         if (lemburList.isEmpty) {
-          return Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[100]!),
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.more_time_rounded, size: 32, color: primaryColor),
                 ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Icon(Icons.more_time_rounded, size: 48, color: Colors.grey[300]),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Belum Ada Pengajuan Lembur',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF475569),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Histori lembur Anda akan muncul di sini setelah diajukan.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF94A3B8),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                const Text(
+                  'Belum Ada Pengajuan Lembur',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1E293B),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                const Text(
+                  'Histori lembur Anda akan muncul di sini setelah diajukan.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+              ],
+            ),
           );
         }
 
         String formatDate(String dateStr) {
           try {
             final date = DateTime.parse(dateStr);
-            return DateFormat('dd MMMM yyyy', 'id_ID').format(date);
+            return DateFormat('d MMM yyyy', 'id_ID').format(date);
           } catch (_) {
             return dateStr;
           }
         }
 
         String formatTime(String? dateTimeStr) {
-          if (dateTimeStr == null) return '-';
+          if (dateTimeStr == null || dateTimeStr.isEmpty) return '-';
           try {
             if (dateTimeStr.length == 5 && dateTimeStr.contains(':')) {
               return dateTimeStr;
@@ -1726,66 +1831,51 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
         Widget getStatusChip(int status) {
           String label = 'Pending';
-          Color bgColor = Colors.amber.shade50;
-          Color textColor = Colors.amber.shade800;
+          Color bgColor = const Color(0xFFFFFBEB);
+          Color textColor = const Color(0xFFD97706);
+          IconData icon = Icons.schedule_rounded;
 
           if (status == 1) {
             label = 'Disetujui';
-            bgColor = Colors.green.shade50;
-            textColor = Colors.green.shade700;
+            bgColor = const Color(0xFFF0FDF4);
+            textColor = const Color(0xFF16A34A);
+            icon = Icons.check_circle_outline_rounded;
           } else if (status == 2) {
             label = 'Ditolak';
-            bgColor = Colors.red.shade50;
-            textColor = Colors.red.shade700;
+            bgColor = const Color(0xFFFEF2F2);
+            textColor = const Color(0xFFDC2626);
+            icon = Icons.highlight_off_rounded;
           }
 
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(6),
             ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                color: textColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          );
-        }
-
-        Widget buildTimeInfo(String label, String value, IconData icon) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 16, color: Colors.grey[500]),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      value,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF334155), fontWeight: FontWeight.bold),
-                    ),
-                  ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 12, color: textColor),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         }
 
         Widget buildActionButton(int idLembur, String? lemburIn, String? lemburOut) {
-          if (lemburIn == null) {
+          if (lemburIn == null || lemburIn.isEmpty) {
             return SizedBox(
               width: double.infinity,
+              height: 40,
               child: ElevatedButton.icon(
                 onPressed: () async {
                   final result = await Navigator.push(
@@ -1802,20 +1892,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ref.invalidate(dashboardProvider);
                   }
                 },
-                icon: const Icon(Icons.login_rounded, size: 18),
-                label: const Text('Mulai Lembur (Absen Masuk)', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.login_rounded, size: 16),
+                label: const Text(
+                  'Mulai Lembur (Absen Masuk)',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   elevation: 0,
                 ),
               ),
             );
-          } else if (lemburOut == null) {
+          } else if (lemburOut == null || lemburOut.isEmpty) {
             return SizedBox(
               width: double.infinity,
+              height: 40,
               child: ElevatedButton.icon(
                 onPressed: () async {
                   final result = await Navigator.push(
@@ -1832,12 +1926,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ref.invalidate(dashboardProvider);
                   }
                 },
-                icon: const Icon(Icons.logout_rounded, size: 18),
-                label: const Text('Selesai Lembur (Absen Pulang)', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.logout_rounded, size: 16),
+                label: const Text(
+                  'Selesai Lembur (Absen Pulang)',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange.shade700,
+                  backgroundColor: const Color(0xFFD97706),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   elevation: 0,
                 ),
@@ -1846,19 +1943,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           } else {
             return Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 18),
+                  Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A), size: 15),
                   SizedBox(width: 6),
                   Text(
                     'Lembur Selesai & Tercatat',
-                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(
+                      color: Color(0xFF16A34A),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11.5,
+                    ),
                   ),
                 ],
               ),
@@ -1873,60 +1975,180 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             final String? lemburIn = item['lembur_in'];
             final String? lemburOut = item['lembur_out'];
 
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey[100]!),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE2E8F0), width: 1.15),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.025),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(14.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Header: Tanggal & Status Badge
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          formatDate(item['tanggal']),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(Icons.calendar_today_rounded, size: 13, color: Color(0xFF475569)),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              formatDate(item['tanggal']),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                          ],
                         ),
                         getStatusChip(status),
                       ],
                     ),
-                    const Divider(height: 24),
+                    const SizedBox(height: 12),
+
+                    // Time Blocks: Rencana Jam vs Realisasi Jam
                     Row(
                       children: [
+                        // Rencana
                         Expanded(
-                          child: buildTimeInfo(
-                            'Rencana Jam',
-                            '${formatTime(item['lembur_mulai'])} - ${formatTime(item['lembur_selesai'])}',
-                            Icons.schedule_outlined,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(9),
+                              border: Border.all(color: const Color(0xFFF1F5F9)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.schedule_rounded, size: 12, color: Color(0xFF64748B)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Rencana Jam',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Color(0xFF64748B),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '${formatTime(item['lembur_mulai'])} - ${formatTime(item['lembur_selesai'])}',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFF1E293B),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        // Realisasi
                         Expanded(
-                          child: buildTimeInfo(
-                            'Realisasi Jam',
-                            '${formatTime(lemburIn)} - ${formatTime(lemburOut)}',
-                            Icons.play_circle_outline_rounded,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(9),
+                              border: Border.all(color: const Color(0xFFF1F5F9)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.play_circle_outline_rounded, size: 12, color: Color(0xFF64748B)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Realisasi Jam',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Color(0xFF64748B),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  '${formatTime(lemburIn)} - ${formatTime(lemburOut)}',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: Color(0xFF1E293B),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    buildTimeInfo(
-                      'Keterangan / Tugas',
-                      item['keterangan'] ?? '-',
-                      Icons.description_outlined,
-                    ),
+
+                    // Keterangan / Tugas
+                    if (item['keterangan'] != null && item['keterangan'].toString().isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(9),
+                          border: Border.all(color: const Color(0xFFF1F5F9)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'KETERANGAN / TUGAS',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Color(0xFF94A3B8),
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              item['keterangan'] ?? '-',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                color: Color(0xFF475569),
+                                height: 1.35,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
+                    // Action button if status approved
                     if (status == 1) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       buildActionButton(idLembur, lemburIn, lemburOut),
                     ],
                   ],
@@ -1943,12 +2165,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       error: (err, stack) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.red.shade50,
+          color: const Color(0xFFFEF2F2),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFFEE2E2)),
         ),
         child: Text(
           'Gagal memuat data lembur: $err',
-          style: TextStyle(color: Colors.red.shade800, fontSize: 13),
+          style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13),
         ),
       ),
     );

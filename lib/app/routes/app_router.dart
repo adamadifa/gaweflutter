@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gaweflutter/features/auth/login_screen.dart';
 import 'package:gaweflutter/features/dashboard/dashboard_screen.dart';
+import 'package:gaweflutter/features/splash/presentation/screens/splash_screen.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
 
 final authStatusProvider = Provider<AuthStatus>((ref) {
@@ -12,8 +13,11 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authStatus = ref.watch(authStatusProvider);
 
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     redirect: (context, state) {
+      final isSplash = state.matchedLocation == '/splash';
+      if (isSplash) return null; // Let splash screen handle the initial transition
+
       final isLoggedIn = authStatus == AuthStatus.authenticated;
       final isLoggingIn = state.matchedLocation == '/login';
 
@@ -30,6 +34,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
