@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gaweflutter/core/config/app_config.dart';
 import 'package:gaweflutter/core/storage/secure_storage.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
 
@@ -318,45 +320,60 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: _primaryGreen,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(13),
+                                border: Border.all(color: _cardBorder),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: _primaryGreen.withValues(alpha: 0.25),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
+                                    color: Colors.black.withValues(alpha: 0.04),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
-                              child: const Icon(
-                                Icons.fingerprint_rounded,
-                                size: 26,
-                                color: Colors.white,
+                              padding: const EdgeInsets.all(6),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.contain,
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'GAWE',
-                                  style: TextStyle(
-                                    fontSize: 16.5,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.5,
-                                    color: _textPrimary,
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'GAWE',
+                                    style: TextStyle(
+                                      fontSize: 16.5,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.5,
+                                      color: _textPrimary,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'HR & Presensi Mobile',
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w500,
-                                    color: _textSecondary,
+                                  Text(
+                                    'HR & Presensi Mobile',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w500,
+                                      color: _textSecondary,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                            if (!AppConfig.isStaticServer)
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.dns_outlined,
+                                  size: 20,
+                                  color: _textSecondary,
+                                ),
+                                tooltip: 'Pengaturan Server',
+                                onPressed: () {
+                                  context.push('/server-config?isModal=true');
+                                },
+                              ),
                           ],
                         ),
 

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gaweflutter/core/config/app_config.dart';
 import 'package:gaweflutter/core/constants/app_constants.dart';
 import 'package:gaweflutter/core/storage/secure_storage.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
@@ -12,7 +13,6 @@ class DioClient {
   DioClient(this._ref)
       : _dio = Dio(
           BaseOptions(
-            baseUrl: AppConstants.baseUrl,
             connectTimeout: AppConstants.connectTimeout,
             receiveTimeout: AppConstants.receiveTimeout,
             contentType: Headers.jsonContentType,
@@ -25,6 +25,12 @@ class DioClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          // Dynamically resolve base URL from AppConfig (whether from .env or SecureStorage)
+          final currentBaseUrl = await AppConfig.getBaseUrl();
+          if (currentBaseUrl != null && currentBaseUrl.isNotEmpty) {
+            options.baseUrl = currentBaseUrl;
+          }
+
           // Retrieve bearer token from secure storage
           final token = await SecureStorage.getToken();
           if (token != null && token.isNotEmpty) {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gaweflutter/app/routes/app_router.dart';
+import 'package:gaweflutter/core/config/app_config.dart';
 import 'package:gaweflutter/core/constants/app_constants.dart';
 import 'package:gaweflutter/core/services/mock_location_service.dart';
 import 'package:gaweflutter/features/security/presentation/screens/fake_gps_block_screen.dart';
@@ -13,6 +14,7 @@ import 'package:gaweflutter/features/dashboard/presentation/providers/dashboard_
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppConfig.init();
   await initializeDateFormatting('id_ID', null);
   runApp(
     const ProviderScope(

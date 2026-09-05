@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gaweflutter/features/auth/login_screen.dart';
 import 'package:gaweflutter/features/dashboard/dashboard_screen.dart';
+import 'package:gaweflutter/features/server_config/presentation/screens/server_config_screen.dart';
 import 'package:gaweflutter/features/splash/presentation/screens/splash_screen.dart';
 import 'package:gaweflutter/features/auth/presentation/providers/auth_provider.dart';
 
@@ -15,11 +16,13 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
     redirect: (context, state) {
-      final isSplash = state.matchedLocation == '/splash';
-      if (isSplash) return null; // Let splash screen handle the initial transition
+      final loc = state.matchedLocation;
+      if (loc == '/splash' || loc == '/server-config') {
+        return null; // Let splash and server-config handle transitions
+      }
 
       final isLoggedIn = authStatus == AuthStatus.authenticated;
-      final isLoggingIn = state.matchedLocation == '/login';
+      final isLoggingIn = loc == '/login';
 
       // If not logged in and not on login page, redirect to login
       if (!isLoggedIn && !isLoggingIn) {
@@ -39,6 +42,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+        path: '/server-config',
+        builder: (context, state) {
+          final isModal = state.uri.queryParameters['isModal'] == 'true';
+          return ServerConfigScreen(isModal: isModal);
+        },
+      ),
+      GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
       ),
@@ -49,3 +59,4 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+

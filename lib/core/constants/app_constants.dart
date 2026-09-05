@@ -15,4 +15,5 @@ class AppConstants {
   static const String keyToken = 'auth_token';
   static const String keyDeviceId = 'user_device_id';
   static const String keyUser = 'user_data';
+  static const String keyServerUrl = 'custom_server_base_url';
 }
